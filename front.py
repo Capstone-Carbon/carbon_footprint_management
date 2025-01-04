@@ -1,1 +1,2 @@
 print(front)
+print(front)
