@@ -1,0 +1,325 @@
+body {
+  margin: 0;
+  background-color: #f3f2f2;
+}
+
+.wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+* {
+  box-sizing: border-box;
+}
+a {
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.clear{
+  clear: both;
+}
+
+
+#navbar {
+  padding: 0 10px;
+  width: 100%;
+}
+  
+header {
+  background-color: white;
+  width: 100%;
+  padding: 0 30px;
+}
+
+.logo {
+  float: left;
+  width: 130px;
+  font-weight: bold;
+  padding: 17px 0;
+  color: #4CAF50;
+  cursor: pointer;
+}
+.logo a {
+  margin: auto 0;
+}
+
+#login{
+  float: right;
+  font-size: 17px;
+  padding: 5px 0;
+}
+  
+.main_menu {
+  margin-left: 30px;
+  text-decoration: none;
+  color: black;
+  font-size: 1.2em;
+  padding: 36px 15px;
+  transition: 0.5s;
+  
+}
+.main_menu:hover {
+  color: #4CAF50;
+}
+
+.menu {
+  float: right;
+  display: block;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+.login {
+  border: 1px solid black;
+  margin-left: 20px;
+  border-radius: 30px;
+  padding: 10px 15px;
+  font-size: 0.8em;
+  color: black;
+}
+
+#community, #mypage {
+  position: relative;
+}
+.dropdown_menu {
+  display: none;
+  position: absolute;
+  background-color:white;
+  top: 63px;
+  left: 25px;
+  z-index: 1;
+  min-width: 120px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  
+}
+.dropdown_menu a {
+  float: none;
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+  transition: 0.5s;
+}
+
+.dropdown_menu a:hover {
+  background-color: #f3f2f2;
+  color: #4CAF50;
+  transition: 0.5s;
+}
+#community:hover .dropdown_menu {
+  display: block;
+}
+#mypage:hover .dropdown_menu {
+  display: block;
+}
+
+.sidebtn {
+  float: right;
+  padding: 21px 0;
+  display: none;
+}
+
+.sidenav {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  background-color: rgba(76, 175, 80, 0.9);
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+}
+
+.sidenav a {
+  padding: 8px 8px 10px 20px;
+  text-decoration: none;
+  font-size: 1.5em;
+  color: black;
+  display: block;
+  transition: 0.3s;
+}
+
+.sidenav a:hover {
+  color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+}
+
+
+
+/* 나의 탄소 발자국 */
+
+.dashboard {
+  display: flex;
+  justify-content: space-between;
+  padding: 30px;
+  background-color: white;
+  margin: 30px 0;
+  border-radius: 10px;
+}
+  
+.my-carbon {
+  width: 70%;
+}
+ 
+.my-carbon h2 {
+  margin: 10px 0 15px 0;
+  font-size: 1.5em;
+}
+
+.chart {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 200px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+ 
+.chart .bar {
+  width: 15%;
+  background-color: #ccc;
+  text-align: center;
+  font-size: 0.8em;
+  color: black;
+}
+  
+.chart .bar.active {
+  background-color: #4CAF50;
+}
+  
+.goal-section {
+  width: 25%;
+  display: block;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin: auto 0;
+  padding-right: 10px;
+}
+
+.goal-section p {
+  padding-bottom: 20px;
+}
+
+.goal-section button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 0.9em;
+  border-radius: 5px;
+}
+ 
+.info {
+  display: flex;
+  justify-content: space-around;
+  background-color: #f9f9f9;
+  padding:20px;
+  height: 350px;
+  border: 1px solid #ddd;
+}
+  
+
+/* 공지사항 */
+.content {
+  padding: 30px 0;
+}
+
+.notice {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+}
+#notice_txt {
+  float: left;
+  font-size: 1.5em;
+  margin: 10px 0;
+}
+.notice_plus {
+  float: right;
+  font-size: 1.5em;
+  font-weight: bold;
+  padding: 0 15px;
+  margin-top: 13px;
+  cursor: pointer;
+}
+
+
+footer .notice h3 {
+  margin: 0 0 10px 0;
+  
+}
+
+/* footer */
+footer {
+  background-color: #4e4e4e;
+  
+}
+#footer_content {
+  padding: 30px;
+}
+
+.f_cont1 {
+  float: left;
+}
+.f_cont1 p, .f_cont2 p {
+  color: white;
+  font-size: 15px;
+}
+
+.f_cont2 {
+  float: right;
+}
+.f_cont2 p {
+  color: white;
+  text-align: right;
+}
+
+/* 작은 화면 (모바일) */
+@media (max-width: 880px) {
+  .menu {
+    display: none;
+  } 
+
+  .sidebtn {
+    display: block;
+  }
+}
+
+@media (max-width: 800px) {
+  
+  
+  .f_cont1 {
+    float: none;
+    text-align: center;
+  }
+  .f_cont2 {
+    float: none;
+    margin-top: 20px;
+  }
+  .f_cont2 p {
+    color: white;
+    text-align: center;
+  }
+}
