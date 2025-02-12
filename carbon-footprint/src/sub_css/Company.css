@@ -1,0 +1,133 @@
+
+/* 전체 레이아웃 */
+.footprint_container {
+    display: flex;
+    height: 130vh;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  /* 왼쪽 사이드바 스타일 */
+  .sidebar {
+    text-align: center;
+    width: 250px;
+    background: white;
+    border-radius: 20px;
+    margin: 50px 20px;
+    height: 330px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sidebar h2 {
+    padding : 30px 0;
+    margin: 0;
+    background: #4CAF50;
+    color: white;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar ul li {
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    font-size: 17px;
+    font-weight: bold;
+    color: #2f2f2f;
+    text-align: center;
+  }
+  
+  
+  .sidebar ul li a {
+    display: block; 
+    width: 100%;    
+    padding: 15px 0;
+    text-decoration: none;
+    color: black;
+  }
+  
+  .sidebar ul li:hover {
+    background: #ddd;
+  }
+  
+  
+  /* 메인 컨텐츠 스타일 */
+  .main-content {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  h2 {
+    color: #333;
+  }
+  
+  /* 차트 컨테이너 스타일 */
+  .chart-container {
+    
+  }
+  .bar-chart canvas{
+    padding: 10px;
+    width: 100%;    
+    max-width: 600px; 
+    height: 100%;
+    max-height: 400px;
+    margin: 20px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  #instruction {
+    width: 90%;
+    margin: 50px auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  #instruction>p {
+    line-height: 180%;
+  }
+
+  /* 반응형 설정 */
+@media (max-width: 1000px) {
+  .footprint_container {
+      flex-direction: column;
+      align-items: center;
+  }
+
+  .sidebar {
+      width: 100%;
+      height: auto;
+      margin: 20px 0;
+      padding: 10px;
+  }
+
+  .sidebar ul {
+      display: flex;
+      justify-content: space-around;
+  }
+
+  .sidebar ul li {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      border-bottom: none;
+  }
+
+  .chart-container {
+      width: 90%;
+      margin: 0 auto;
+  }
+
+  .bar-chart canvas {
+      min-width: 100%;
+      max-width: none;
+      margin: 0 auto;
+  }
+}
