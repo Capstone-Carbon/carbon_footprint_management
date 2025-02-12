@@ -1,0 +1,153 @@
+/* 전체 페이지 스타일 */
+.event_container {
+    display: flex;
+    height: 140vh;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+  /* 메인 콘텐츠 스타일 */
+  .main-content {
+    flex: 1;
+    border-radius: 10px;
+  }
+  
+  .main-content h2 {
+    font-size: 24px;
+    color: #333;
+    margin: 30px 0;
+  }
+  
+  .main-content p {
+    font-size: 16px;
+    color: #555;
+  }
+
+  .eventComponent {
+    padding: 0 30px;
+    border-radius: 20px;
+    height: 90%;
+  }
+
+  .event-guide {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 30px;
+    background-color: #f8fff0;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    
+  }
+
+  p {
+    line-height: 1.6;
+    font-size: 16px;
+  }
+  
+  strong {
+    color: #388e3c;
+  }
+  
+  em {
+    font-style: italic;
+    color: #666;
+  }
+  
+  
+  /* 폼 스타일 */
+  #applyForm {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    margin: 30px auto;
+    padding: 20px 30px;
+    
+  }
+  
+  .receiptLabel {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  #applyFile {
+    padding: 10px;
+    width: 250px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    background-color: #fff;
+    cursor: pointer;
+  }
+  
+  
+  /* 이미지 미리보기 */
+  .image-preview {
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .image-preview img {
+    max-width: 300px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* 버튼 스타일 */
+  #applybtn {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 18px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 15px 0;
+    transition: background 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  
+  /* 피드백 메시지 */
+  .feedback-message {
+    font-size: 16px;
+    font-weight: bold;
+    color: #d9534f;
+    margin-top: 15px;
+  }
+  
+  /* 반응형 스타일 */
+  @media (max-width: 768px) {
+    .event_container {
+      flex-direction: column;
+    }
+    
+    .sidebar {
+      margin: 30px auto;
+      min-height: auto;
+      text-align: center;
+    }
+    
+    .main-content {
+      margin: 10px;
+      padding: 20px;
+    }
+
+    #applyFile {
+      padding: 10px;
+      width: auto;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      background-color: #fff;
+      cursor: pointer;
+    }
+  }
+  

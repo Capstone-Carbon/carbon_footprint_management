@@ -1,0 +1,157 @@
+/* 전체 컨테이너 */
+.container {
+  display: flex;
+  flex-wrap: wrap; /* 화면 크기에 따라 줄바꿈 */
+  width: 100%;
+}
+
+/* 왼쪽 사이드바 스타일 */
+.sidebar {
+  text-align: center;
+  width: 250px;
+  background: white;
+  border-radius: 20px;
+  margin: 50px 20px;
+  height: 330px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 메인 컨텐츠 */
+.main-content {
+  flex: 1;
+  padding: 20px;
+  min-width: 300px; /* 최소 너비 지정 */
+}
+
+/* 레벨 섹션 */
+.level-section {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px 30px;
+  margin-bottom: 50px;
+}
+
+/* 진행 바 */
+.progress-container {
+  width: 100%;
+  background-color: #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 20px;
+  background-color: #ddd;
+  border-radius: 10px;
+}
+
+.progress {
+  height: 100%;
+  width: 0%;
+  background-color: #4CAF50;
+  transition: width 0.5s ease-in-out;
+}
+
+/* 도장 섹션 */
+.stamp-section {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px 30px;
+  margin-bottom: 50px;
+}
+
+.stamp-container {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap; /* 줄바꿈 가능하도록 설정 */
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.stamp {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #4CAF50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.filled {
+  background-color: #4CAF50;
+  color: white;
+}
+
+/* 쿠폰 섹션 */
+.coupon-section {
+  background-color: white;
+  border: 1px solid #ddd;
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 20px 0 50px 0;
+  cursor: pointer;
+}
+
+.coupon-section p {
+  color: black;
+}
+
+.coupon-section:active {
+  background-color: #ddd;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 1024px) {
+  .container {
+      flex-direction: column;
+      align-items: center;
+  }
+
+  .sidebar {
+      width: 90%;
+      height: auto;
+      margin: 20px;
+  }
+
+  .stamp-container {
+      justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .main-content {
+      padding: 10px;
+  }
+
+  .stamp {
+      width: 25px;
+      height: 25px;
+      font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stamp-container {
+      flex-direction: row;
+      align-items: center;
+  }
+
+  .stamp {
+      width: 20px;
+      height: 20px;
+      font-size: 10px;
+  }
+
+  .coupon-section {
+      padding: 5px;
+  }
+}
