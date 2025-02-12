@@ -1,0 +1,159 @@
+  /* 전체 레이아웃 */
+  .community_container {
+    display: flex;
+    height: 120vh;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* 오른쪽 콘텐츠 영역 */
+.main-content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+    height: auto;
+}
+
+table {
+    width: 100%;
+    text-align: center;
+    font-size: 16px;
+    margin: 10px 0;
+    border-top: 1px solid #676767;
+}
+
+.ranking-section {
+    background-color: rgba(76, 175, 80, 0.5);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 20px;
+}
+
+.ranking-section h3, .board-section h3 {
+    text-align: center;
+    font-size: 25px;
+    margin: 10px 0 25px 0;
+}
+
+.board-section {
+    background-color: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin: 30px 0;
+    border-radius: 20px;
+    height: 50%;
+    position: relative;
+}
+
+.ranking-th {
+    padding: 10px 0;
+}
+
+.board-tr {
+    padding: 10px 0;
+}
+
+.board-th {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.post {
+    width: 50px;
+}
+
+.community-number {
+    position: absolute; 
+    bottom: 0;
+    left: 50%;
+    margin: 15px;
+    transform: translate(-60%, -50%);
+}
+
+.write {
+    background-color: rgba(76, 175, 80, 0.5);
+    padding: 15px;
+    font-size: 15px;
+    border-radius: 20px 15px;
+    border: none;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: 15px;
+}
+
+.write:active {
+    background-color: rgba(76, 175, 80, 0.8);
+}
+
+.number {
+    padding: 5px 10px;
+    background: white;
+    border: none;
+}
+
+.number:active {
+    background-color: #ddd;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 1024px) {
+    .community_container {
+        flex-direction: column;
+        height: auto;
+    }
+    .board-section {
+        padding: 20px;
+        margin: 20px 0;
+    }
+    table {
+        font-size: 14px;
+    }
+    .write {
+        font-size: 14px;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .board-section {
+        padding: 15px;
+        margin: 15px 0;
+    }
+    table {
+        font-size: 12px;
+    }
+    .ranking-section h3, .board-section h3 {
+        font-size: 20px;
+    }
+    .write {
+        font-size: 13px;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .board-section {
+        padding: 10px;
+        margin: 10px 0;
+    }
+    table {
+        font-size: 14px;
+    }
+    .ranking-section h3, .board-section h3 {
+        font-size: 24px;
+    }
+    .community-number {
+        position: relative;
+        left: auto;
+        bottom: auto;
+        transform: none;
+        text-align: center;
+    }
+    .write {
+        font-size: 14px;
+        padding: 10px;
+        margin: 10px;
+    }
+}
