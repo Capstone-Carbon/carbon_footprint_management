@@ -1,0 +1,160 @@
+  /* 전체 레이아웃 */
+.footprint_container {
+    display: flex;
+    height: 130vh;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  /* 왼쪽 사이드바 스타일 */
+  .sidebar {
+    text-align: center;
+    width: 250px;
+    background: white;
+    border-radius: 20px;
+    margin: 50px 20px;
+    height: 330px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sidebar h2 {
+    padding : 30px 0;
+    margin: 0;
+    background: #4CAF50;
+    color: white;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar ul li {
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    font-size: 17px;
+    font-weight: bold;
+    color: #2f2f2f;
+    text-align: center;
+  }
+  
+  
+  .sidebar ul li a {
+    display: block; 
+    width: 100%;    
+    padding: 15px 0;
+    text-decoration: none;
+    color: black;
+  }
+  
+  .sidebar ul li:hover {
+    background: #ddd;
+  }
+  
+
+  
+  /* 오른쪽 콘텐츠 영역 */
+  
+  .main-content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+  }
+  .main-content>h2 {
+    margin: 30px 0;
+  }
+
+  .ChartContent {
+    /* max-width: 400px */
+    height: 400px;
+    margin: 10px 0;
+  }
+
+  .pie-chart canvas {
+    width: 100%;    
+    max-width: 400px; 
+    height: 100%;
+    max-height: 400px;
+    border: 2px solid #ccc; 
+    border-radius: 10px; 
+    background-color: white;
+    float: left;
+    padding: 10px;
+  }
+
+  .ChartNumber {
+    width: 200px;
+    float: right;
+    height: 100%;
+    text-align: center;
+    margin: 0 13%;
+  }
+
+  .distance {
+    padding: 8px 0;
+  }
+
+  .write_distaance {
+    margin: 5px 0;
+    padding: 5px;
+    width: 180px;
+    text-align: center;
+  }
+
+  .total {
+    padding: 20px;
+    background-color: white;
+    margin: 30px 0;
+    border-radius: 10px;
+  }
+
+  .total>p {
+    font-size: 18px;
+  }
+
+  @media (max-width: 768px) {
+    .footprint_container {
+      flex-direction: column;
+    }
+    
+    .sidebar {
+      margin: 30px auto;
+      min-height: auto;
+      text-align: center;
+    }
+    
+    .main-content {
+      margin: 10px;
+      padding: 20px;
+    }
+  }
+
+  @media (max-width: 1180px) {
+    .ChartNumber {
+      margin: 0 auto;
+    }
+  }
+
+  @media (max-width: 1000px) {
+    canvas {
+      float: none;
+      margin: 0 auto;
+    }
+    .ChartContent {
+      height: auto;
+      text-align: center;
+    }
+    .pie-chart canvas {
+      float: none;
+    }
+    
+      .ChartNumber {
+        padding: 30px 0;
+        margin: 0 auto;
+        text-align: center;
+        float: none;
+        width: 250px;
+      }
+  }
