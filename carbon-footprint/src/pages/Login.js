@@ -17,10 +17,9 @@ function LoginForm() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // 유효성 검사
+  
     if (!formData.username) {
       setErrorMessage("아이디를 입력해주세요.");
       return;
@@ -29,14 +28,23 @@ function LoginForm() {
       setErrorMessage("비밀번호는 최소 6자리 이상이어야 합니다.");
       return;
     }
-
-    // 에러 메시지 초기화 후 로그인 성공
-    setErrorMessage("");
-    console.log("로그인 데이터 제출:", formData);
-
-    // 로그인 성공 후 App.js로 이동
-    alert("로그인이 완료되었습니다!");
-    navigate("/"); // App.js로 돌아가기
+  
+    try {
+      const response = await fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+  
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+  
+      alert("로그인이 완료되었습니다!");
+      localStorage.setItem("token", data.token); // JWT 저장
+      navigate("/");
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
   };
 
   const handleJoinClick = () => {
