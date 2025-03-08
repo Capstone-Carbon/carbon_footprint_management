@@ -16,7 +16,7 @@ function Join() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // 유효성 검사
@@ -45,8 +45,29 @@ function Join() {
 
     // 에러 메시지 초기화 후 서버로 전송 로직
     setErrorMessage("");
-    console.log("폼 데이터 제출:", formData);
-    alert("회원가입이 완료되었습니다!");
+
+    try {
+      const response = await fetch("http://localhost:5000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: formData.username,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("회원가입이 완료되었습니다!");
+      } else {
+        setErrorMessage(data.message || "회원가입 실패");
+      }
+    } catch (error) {
+      setErrorMessage("서버 오류");
+    }
   };
 
   return (
