@@ -32,10 +32,30 @@ const ChallengeWritePage = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("작성 완료!");
-    navigate("/challenge");
+    
+    try {
+      const response = await fetch('http://localhost:5000/challenges', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        alert("챌린지 글이 성공적으로 등록되었습니다!");
+        navigate("/challenge");
+      } else {
+        const data = await response.json();
+        alert(data.message || "챌린지 글 작성에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert("서버 오류가 발생했습니다.");
+    }
   };
 
   return (

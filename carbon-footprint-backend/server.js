@@ -42,6 +42,17 @@ db.run(
   )`
 );
 
+// ✅ challenges 테이블 생성 (없으면 자동 생성)
+db.run(
+  `CREATE TABLE IF NOT EXISTS challenges (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    detail TEXT NOT NULL,
+    author TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`
+);
+
 // ✅ 회원가입 API
 app.post("/register", async (req, res) => {
   const { username, password } = req.body;
@@ -104,7 +115,7 @@ app.get("/username", (req, res) => {
   }
 });
 
-// ✅ 글 작성 API
+// ✅ 커뮤니티 글 작성 API
 app.post("/posts", (req, res) => {
   const token = req.cookies.token;
   if (!token) {
@@ -127,11 +138,44 @@ app.post("/posts", (req, res) => {
   }
 });
 
-// ✅ 글 목록 조회 API
+// ✅ 커뮤니티 글 목록 조회 API
 app.get("/posts", (req, res) => {
   db.all("SELECT * FROM posts ORDER BY created_at DESC", [], (err, rows) => {
     if (err) {
       return res.status(500).json({ message: "글 목록 조회 실패", error: err.message });
+    }
+    res.json(rows);
+  });
+});
+
+// ✅ 챌린지 글 작성 API
+app.post("/challenges", (req, res) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return res.status(401).json({ message: "로그인 필요" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { title, detail } = req.body;
+    const author = decoded.username;
+
+    db.run("INSERT INTO challenges (title, detail, author) VALUES (?, ?, ?)", [title, detail, author], function (err) {
+      if (err) {
+        return res.status(500).json({ message: "챌린지 글 작성 실패", error: err.message });
+      }
+      res.status(201).json({ message: "챌린지 글 작성 성공", challengeId: this.lastID });
+    });
+  } catch (error) {
+    res.status(401).json({ message: "유효하지 않은 토큰" });
+  }
+});
+
+// ✅ 챌린지 글 목록 조회 API
+app.get("/challenges", (req, res) => {
+  db.all("SELECT * FROM challenges ORDER BY created_at DESC", [], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ message: "챌린지 글 목록 조회 실패", error: err.message });
     }
     res.json(rows);
   });
