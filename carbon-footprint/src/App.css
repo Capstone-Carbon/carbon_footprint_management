@@ -477,3 +477,31 @@ footer {
   }
 }
 
+.userInfo {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin-left: 20px;
+  background-color: #f9f9f9;
+}
+
+.userInfo span {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.logoutButton {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.logoutButton:hover {
+  background-color: #ff1a1a;
+}
+
