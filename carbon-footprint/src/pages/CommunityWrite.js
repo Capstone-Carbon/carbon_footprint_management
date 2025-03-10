@@ -24,10 +24,27 @@ const CommunityWritePage = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault(); // 기본 폼 제출 방지
-    alert("작성 완료!");
-    navigate("/community"); // 글 작성 후 커뮤니티 페이지로 이동
+
+    try {
+      const response = await fetch("http://localhost:5000/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("글 작성 실패");
+      }
+
+      alert("작성 완료!");
+      navigate("/community"); // 글 작성 후 커뮤니티 페이지로 이동
+    } catch (error) {
+      console.error("Failed to submit post:", error);
+      alert("글 작성 실패");
+    }
   };
 
   return (
@@ -77,7 +94,6 @@ const CommunityWritePage = () => {
         </form>
       </div>
     </div>
-    
   );
 };
 

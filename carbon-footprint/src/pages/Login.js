@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../UserContext";
 import "./../App.css";
 
 function LoginForm() {
   const navigate = useNavigate();
+  const { setUsername } = useContext(UserContext);
 
   const [formData, setFormData] = useState({
     username: "",
@@ -17,10 +19,9 @@ function LoginForm() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 유효성 검사
     if (!formData.username) {
       setErrorMessage("아이디를 입력해주세요.");
       return;
@@ -30,13 +31,23 @@ function LoginForm() {
       return;
     }
 
-    // 에러 메시지 초기화 후 로그인 성공
-    setErrorMessage("");
-    console.log("로그인 데이터 제출:", formData);
+    try {
+      const response = await fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
 
-    // 로그인 성공 후 App.js로 이동
-    alert("로그인이 완료되었습니다!");
-    navigate("/"); // App.js로 돌아가기
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+
+      alert("로그인이 완료되었습니다!");
+      setUsername(formData.username); // Update username state
+      navigate("/");
+    } catch (error) {
+      setErrorMessage(error.message);
+    }
   };
 
   const handleJoinClick = () => {

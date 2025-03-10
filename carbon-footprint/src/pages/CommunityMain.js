@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./../sub_css/Community.css"; // 스타일 분리
 
@@ -23,10 +23,22 @@ const CommunityPage = () => {
     { rank: 2, title: "가정 속 탄소 줄이기!", user: "ㄱㄴㄷ" },
   ];
 
-  // 게시판 글 데이터 (예제)
-  const [posts, setPosts] = useState([
-    { id: 1, title: "탄소배출량 줄이는 방법 추천!", author: "⭕⭕⭕" },
-  ]);
+  // 게시판 글 데이터
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/posts");
+        const data = await response.json();
+        setPosts(data);
+      } catch (error) {
+        console.error("Failed to fetch posts:", error);
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   // 글쓰기 페이지로 이동
   const handleJoinClick = () => {

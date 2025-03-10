@@ -1,3 +1,4 @@
+
 /* main */
 html,
 body {
@@ -126,6 +127,36 @@ header {
   display: block;
 }
 
+/* ✅ 로그인 UI 추가 */
+.userInfo {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin-left: 20px;
+  background-color: #f9f9f9;
+}
+
+.userInfo span {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.logoutButton {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.logoutButton:hover {
+  background-color: #ff1a1a;
+}
+
+/* 사이드 버튼 */
 .sidebtn {
   float: right;
   padding: 21px 0;
@@ -166,8 +197,7 @@ header {
   margin-left: 50px;
 }
 
-/* 나의 탄소 발자국 */
-
+/* ✅ 나의 탄소 발자국 */
 .dashboard {
   display: flex;
   justify-content: space-between;
@@ -186,227 +216,16 @@ header {
   font-size: 1.5em;
 }
 
-.mainpage_chart {
-  display: flex;
-  justify-content: space-around;
-  align-items: flex-end;
-  height: 200px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  padding: 10px;
-}
-
-.mainpage_chart .bar {
-  width: 15%;
-  background-color: #ccc;
-  text-align: center;
-  font-size: 0.8em;
-  color: black;
-}
-
-.mainpage_chart .bar.active {
-  background-color: #4caf50;
-}
-
-.goal-section {
-  width: 25%;
-  display: block;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  margin: auto 0;
-  padding-right: 10px;
-}
-
-.goal-section p {
-  padding-bottom: 20px;
-}
-
-.goal-section button {
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  cursor: pointer;
-  font-size: 0.9em;
-  border-radius: 5px;
-}
-
-.info {
-  display: flex;
-  justify-content: space-around;
-  background-color: #f9f9f9;
-  padding: 20px;
-  height: 300px;
-  border: 1px solid #ddd;
-}
-
-/* 공지사항 */
-.content {
-  margin: 50px 0;
-}
-
-.notice {
-  background-color: white;
-  padding: 30px;
-  border-radius: 10px;
-  margin: 0 20px;
-}
-#notice_txt {
-  float: left;
-  font-size: 1.5em;
-  margin: 10px 0;
-}
-.notice_plus {
-  float: right;
-  font-size: 1.5em;
-  font-weight: bold;
-  padding: 0 15px;
-  margin-top: 13px;
-  cursor: pointer;
-}
-
-footer .notice h3 {
-  margin: 0 0 10px 0;
-}
-
-/* footer */
-footer {
-  background-color: #4e4e4e;
-}
-#footer_content {
-  padding: 30px;
-}
-
-.f_cont1 {
-  float: left;
-}
-.f_cont1 p,
-.f_cont2 p {
-  color: white;
-  font-size: 15px;
-}
-
-.f_cont2 {
-  float: right;
-}
-.f_cont2 p {
-  color: white;
-  text-align: right;
-}
-
-/* Login.js */
-#login_form,
-#join {
-  flex: 1; /* 남은 공간을 채움 */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  min-height: 80vh;
-}
-
-#login_inner,
-#join_inner {
-  background-color: white;
-  padding: 20px;
-  border-radius: 15px;
-  min-width: 400px;
-  text-align: center;
-  margin: 30px auto;
-}
-
-#login_inner form,
-#join_inner form {
-  margin: 0 auto;
-}
-
-#login_form form,
-#join form {
-  width: 100%;
-  max-width: 500px;
-  padding: 20px 0;
-}
-
-#login_form span,
-#join span {
-  display: inline-block;
-  width: 20%;
-  margin-bottom: 20px;
-  font-weight: bold;
-}
-
-#login_form input,
-#join input {
-  width: 80%;
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-#loginbtn,
-#joinbtn,
-#confirm {
-  width: 100%;
-  padding: 10px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 15px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-bottom: 20px;
-  font-weight: bold;
-  margin: 10px 0;
-}
-
-#loginbtn:hover,
-#joinbtn:hover {
-  background-color: #45a049;
-}
-
-/* 반응형 스타일 */
+/* ✅ 반응형 스타일 */
 @media (max-width: 1024px) {
   .dashboard {
     flex-direction: column;
     align-items: center;
     padding: 20px;
   }
-  #login_inner,
-  #join_inner {
-    min-width: 90%;
-  }
-
   .my-carbon {
     width: 100%;
     text-align: center;
-  }
-
-  #login_form span,
-  #join span {
-    display: block;
-    width: 100%;
-    margin-bottom: 20px;
-    font-weight: bold;
-  }
-
-  #login_form input,
-  #join input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  .mainpage_chart .bar {
-    width: 20%;
-    font-size: 0.7em;
-  }
-
-  .goal-section {
-    width: 80%;
-    margin-top: 20px;
   }
 }
 
@@ -414,72 +233,10 @@ footer {
   .dashboard {
     padding: 15px;
   }
-
-  .mainpage_chart .bar {
-    width: 50%;
-    margin-bottom: 10px;
-  }
-
-  .goal-section {
-    width: 100%;
-    padding: 0;
-  }
-
-  .goal-section button {
-    width: 100%;
-  }
 }
 
 @media (max-width: 480px) {
   .dashboard {
     padding: 20px;
-  }
-
-  .mainpage_chart {
-    padding: 10px;
-  }
-
-  .mainpage_chart .bar {
-    width: 80%;
-  }
-
-  .goal-section {
-    width: 100%;
-  }
-
-  .goal-section p {
-    font-size: 1em;
-  }
-
-  .goal-section button {
-    font-size: 1em;
-    padding: 8px 12px;
-  }
-}
-
-/* 작은 화면 (모바일) */
-
-@media (max-width: 930px) {
-  .menu {
-    display: none;
-  }
-
-  .sidebtn {
-    display: block;
-  }
-}
-
-@media (max-width: 800px) {
-  .f_cont1 {
-    float: none;
-    text-align: center;
-  }
-  .f_cont2 {
-    float: none;
-    margin-top: 20px;
-  }
-  .f_cont2 p {
-    color: white;
-    text-align: center;
   }
 }

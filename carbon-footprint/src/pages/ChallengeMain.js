@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom"; // Link 추가
 import "./../sub_css/Community.css"; // 스타일 분리
-import { color } from "chart.js/helpers";
 
 const Sidebar = () => {
   return (
@@ -23,14 +22,28 @@ const CommunityPage = () => {
     { rank: 2, title: "가정 속 탄소 줄이기!", user: "ㄱㄴㄷ" },
   ];
 
-  // 게시판 글 데이터 (예제)
-  const [posts, setPosts] = useState([
-    { id: 1, title: "탄소배출량 줄이는 방법 추천!", author: "⭕⭕⭕" },
-  ]);
+  // 게시판 글 데이터
+  const [posts, setPosts] = useState([]);
 
-  // 새 글 추가
-  const [newPost, setNewPost] = useState("");
-  
+  // 서버에서 게시글 데이터 가져오기
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/challenges', {
+          credentials: 'include'
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setPosts(data);
+        }
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
   const handleJoinClick = () => {
     navigate("/challengeWrite");
   };
@@ -40,7 +53,7 @@ const CommunityPage = () => {
       <Sidebar />
       <div className="main-content">
         <h2>챌린지</h2>
-        
+
         {/* 랭킹 섹션 */}
         <div className="ranking-section">
           <h3>RANK</h3>
@@ -64,7 +77,7 @@ const CommunityPage = () => {
           </table>
         </div>
         
-        {/* 챌린지지 섹션 */}
+        {/* 챌린지 섹션 */}
         <div className="board-section">
           <h3>챌린지</h3>
           <table>
