@@ -312,6 +312,68 @@ footer {
   font-weight: bold;
 }
 
+/* Login.js */
+#login_form, #join{
+  flex: 1; /* 남은 공간을 채움 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 80vh;
+}
+
+#login_inner, #join_inner {
+  background-color: white;
+  padding: 20px;
+  border-radius: 15px;
+  min-width: 500px;
+  text-align: center;
+  margin: 30px auto;
+}
+
+#login_inner form, #join_inner form {
+  margin: 0 auto;
+}
+
+#login_form form, #join form {
+  width: 100%;
+  max-width: 500px;
+  padding: 20px 0;
+}
+
+#login_form span, #join span {
+  display: inline-block;
+  width: 20%;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+#login_form input, #join input{
+  width: 80%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+#loginbtn, #joinbtn, #confirm {
+  width: 100%;
+  padding: 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 15px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+#loginbtn:hover, #joinbtn:hover{
+  background-color: #45a049;
+}
+
 /* ✅ AI 브랜치 추가: 로그아웃 버튼 */
 .logoutButton {
   background-color: #ff4d4d;
@@ -338,6 +400,34 @@ footer {
     width: 80%;
     margin-top: 20px;
   }
+
+  #login_inner, #join_inner {
+    min-width: 90%;
+  }
+
+  .my-carbon {
+    width: 100%;
+    text-align: center;
+  }
+
+  #login_form span, #join span {
+    display: block;
+    width: 100%;
+    margin-bottom: 20px;
+    font-weight: bold;
+  }
+  
+  #login_form input, #join input{
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  .mainpage_chart .bar {
+    width: 20%;
+    font-size: 0.7em;
+  }
 }
 
 @media (max-width: 930px) {
@@ -363,5 +453,62 @@ footer {
 
   .f_cont2 p {
     text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 15px;
+  }
+
+
+  .mainpage_chart .bar {
+    width: 50%;
+    margin-bottom: 10px;
+  }
+
+  .goal-section {
+    width: 100%;
+    padding: 0;
+  }
+
+  .goal-section button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard {
+    padding: 20px;
+  }
+
+  .mainpage_chart {
+    padding: 10px;
+  }
+
+  .mainpage_chart .bar {
+    width: 80%;
+  }
+
+  .goal-section {
+    width: 100%;
+  }
+
+  .goal-section p {
+    font-size: 1em;
+  }
+
+  .goal-section button {
+    font-size: 1em;
+    padding: 8px 12px;
+  }
+  
+  #login_inner, #join_inner {
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+    min-width: 80%;
+    text-align: center;
+    margin: 30px auto;
   }
 }

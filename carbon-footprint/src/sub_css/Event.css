@@ -1,5 +1,5 @@
 /* 전체 페이지 스타일 */
-.event_container {
+.container {
     display: flex;
     height: 140vh;
     max-width: 1200px;

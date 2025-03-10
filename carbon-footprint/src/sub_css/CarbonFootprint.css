@@ -66,11 +66,19 @@
 /* 파이 차트 크기 및 위치 조정 */
 .chart2-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  max-width: 450px;
-  margin: auto;
+  justify-content: center; /* 가로 중앙 정렬 */
+  align-items: center; /* 세로 중앙 정렬 */
+  width: 450px; /* 차트 크기 조절 */
+  height: 450px; /* 컨테이너 크기 조절 */
+  margin: 20px auto; /* 자동 마진으로 중앙 배치 */
+  border-radius: 10px;
 }
+.pie-chart {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 50px auto;
+  }
 
 .pie-chart canvas {
   width: 100%;
@@ -96,6 +104,9 @@
   font-size: 18px;
 }
 
+.prediction-info {
+  width: 100%;
+}
 .recommendations {
   background: white;
   padding: 15px;
@@ -117,6 +128,19 @@
 .recommendations ul li {
   padding: 8px;
   font-size: 16px;
+}
+
+.recommendation-button {
+  display: block;
+  background-color: rgba(76, 175, 80);;
+  color: white;
+  border-radius: 10px;
+  border: none;
+  font-weight: bold;
+  font-size: 20px;
+  padding: 15px 40px;
+  margin: 50px auto;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 768px) {

@@ -50,7 +50,7 @@ const EventPage = () => {
   };
 
   return (
-    <div className="event_container">
+    <div className="container">
       <Sidebar />
       <div className="main-content">
         <h2>제품 응모 페이지</h2>

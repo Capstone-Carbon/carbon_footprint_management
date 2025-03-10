@@ -40,7 +40,7 @@ const CompanyCarbonFootprint = () => {
       <div className="main-content">
       <h2>기업 탄소 배출량 분석</h2>
       <div id="instruction">
-        <h2>TOE란?</h2>
+        <h2>📌 TOE란?</h2>
         <p>산업체가 사용하는 에너지의 종류에 따라 탄소 배출량을 계산하는 것으로, 각 에너지의 탄소 배출계수를 사용해 총배출량을 계산하고, 이를 TOE로 환산하여 탄소 배출량 (tCo2) 을 확인할 수 있습니다.
         </p>
       </div>

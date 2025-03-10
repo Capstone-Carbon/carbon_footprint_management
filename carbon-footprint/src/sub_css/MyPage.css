@@ -116,9 +116,9 @@
   }
 
   .sidebar {
-      width: 90%;
+      width: 95%;
       height: auto;
-      margin: 20px;
+      margin: 20px auto;
   }
 
   .stamp-container {
