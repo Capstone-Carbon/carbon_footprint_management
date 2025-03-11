@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./../sub_css/Community.css"; // 스타일 분리
+import { color } from "chart.js/helpers";
 
 const Sidebar = () => {
   return (
@@ -17,7 +18,7 @@ const Sidebar = () => {
 const CommunityPage = () => {
   const navigate = useNavigate();
 
-  // 랭킹 데이터 (예제)
+  // 랭킹 데이터 (예제) ==> 예제니깐 서버랑 연동해서 sql title, user 가져와서 수정해야함
   const rankings = [
     { rank: 1, title: "탄소배출량 줄이는 방법 추천!", user: "⭕⭕⭕" },
     { rank: 2, title: "가정 속 탄소 줄이기!", user: "ㄱㄴㄷ" },
@@ -71,7 +72,7 @@ const CommunityPage = () => {
               {rankings.map((item) => (
                 <tr className="ranking-tr" key={item.rank}>
                   <td className="ranking-th">{item.rank}</td>
-                  <td className="ranking-th">{item.title}</td>
+                  <td className="ranking-th"><Link to="/communityCheck" style={{color:"black"}}>{item.title}</Link></td>
                   <td className="ranking-th">{item.user}</td>
                 </tr>
               ))}
