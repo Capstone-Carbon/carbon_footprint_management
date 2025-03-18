@@ -6,7 +6,7 @@ import pandas as pd
 app = FastAPI()
 
 # 저장된 모델 불러오기
-model_path = "C:/Projects/carbon_footprint_management/data/carbon_model.pkl"
+model_path = "./data/carbon_model.pkl"
 model = joblib.load(model_path)
 
 @app.get("/")
