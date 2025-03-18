@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 # 저장된 모델 불러오기
-model_path = "C:/Projects/carbon_footprint_management/data/carbon_model.pkl"
+model_path = "./data/carbon_model.pkl"
 model = joblib.load(model_path)
 
 # 새로운 입력 데이터 (예: 자가용 20km, 버스 10km, 자전거 5km, 도보 2km, 기차 15km 이동)

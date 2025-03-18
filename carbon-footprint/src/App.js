@@ -7,8 +7,10 @@ import PersonalFootprint from "./pages/PersonalFootprint";
 import CompanyFootprint from "./pages/CompanyFootprint";
 import Community from "./pages/CommunityMain";
 import CommunityWrite from "./pages/CommunityWrite";
+import CommunityCheck from "./pages/CommunityCheck";
 import Challenge from "./pages/ChallengeMain";
 import ChallengeWrite from "./pages/ChallengeWrite";
+import ChallengeCheck from "./pages/ChallengeCheck";
 import EventPage from "./pages/EventMain"; 
 import MyPage from "./pages/MypageMain";
 import footprint from "./images/footprint.png";
@@ -219,8 +221,10 @@ function App() {
 
               <Route path="/community" element={<Community />} />
               <Route path="/communityWrite" element={<CommunityWrite />} />
+              <Route path="/communityCheck" element={<CommunityCheck />} />
               <Route path="/challenge" element={<Challenge />} />
               <Route path="/challengeWrite" element={<ChallengeWrite />} />
+              <Route path="/challengeCheck" element={<ChallengeCheck />} />
 
               <Route path="/mypage" element={<MyPage stampCount={stampCount} />} />
               <Route path="/event" element={<EventPage stampCount={stampCount} setStampCount={setStampCount} />} />

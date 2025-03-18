@@ -54,19 +54,20 @@ function Join() {
         },
         body: JSON.stringify({
           username: formData.username,
+          email: formData.email,
           password: formData.password,
         }),
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("회원가입이 완료되었습니다!");
-      } else {
+      if (!response.ok) {
+        const data = await response.json();
         setErrorMessage(data.message || "회원가입 실패");
+        return;
       }
+
+      alert("회원가입이 완료되었습니다!");
     } catch (error) {
-      setErrorMessage("서버 오류");
+      setErrorMessage("서버 오류: " + error.message);
     }
   };
 
