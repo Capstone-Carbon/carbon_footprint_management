@@ -93,7 +93,7 @@ const CommunityPage = () => {
               {posts.map((post) => (
                 <tr className="board-tr" key={post.id}>
                   <td className="board-th">{post.id}</td>
-                  <td className="board-th">{post.title}</td>
+                  <td className="board-th"><Link to="/challengeCheck" style={{color:"black"}}>{post.title}</Link></td>
                   <td className="board-th">{post.author}</td>
                 </tr>
               ))}

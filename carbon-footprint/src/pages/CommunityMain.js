@@ -100,7 +100,7 @@ const CommunityPage = () => {
                   style={{ cursor: "pointer" }} // 마우스 커서 변경
                 >
                   <td className="board-th">{post.id}</td>
-                  <td className="board-th">{post.title}</td>
+                  <td className="board-th"><Link to="/communityCheck" style={{color:"black"}}>{post.title}</Link></td>
                   <td className="board-th">{post.author}</td>
                 </tr>
               ))}
