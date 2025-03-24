@@ -1,28 +1,34 @@
-import React, { useState, useEffect, useContext } from "react";
-import "./App.css";
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
-import LoginForm from "./pages/Login";
-import Join from "./pages/Join";
-import PersonalFootprint from "./pages/PersonalFootprint";
-import CompanyFootprint from "./pages/CompanyFootprint";
-import Community from "./pages/CommunityMain";
-import CommunityWrite from "./pages/CommunityWrite";
-import CommunityCheck from "./pages/CommunityCheck";
-import Challenge from "./pages/ChallengeMain";
-import ChallengeWrite from "./pages/ChallengeWrite";
-import ChallengeCheck from "./pages/ChallengeCheck";
-import EventPage from "./pages/EventMain"; 
-import MyPage from "./pages/MypageMain";
-import footprint from "./images/footprint.png";
-import { UserProvider, UserContext } from "./UserContext";
+import React, { useState, useEffect, useContext } from 'react';
+import './App.css';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useLocation,
+} from 'react-router-dom';
+import LoginForm from './pages/Login';
+import Join from './pages/Join';
+import PersonalFootprint from './pages/PersonalFootprint';
+import CompanyFootprint from './pages/CompanyFootprint';
+import Community from './pages/CommunityMain';
+import CommunityWrite from './pages/CommunityWrite';
+import CommunityCheck from './pages/CommunityCheck';
+import Challenge from './pages/ChallengeMain';
+import ChallengeWrite from './pages/ChallengeWrite';
+import ChallengeCheck from './pages/ChallengeCheck';
+import EventPage from './pages/EventMain';
+import MyPage from './pages/MypageMain';
+import footprint from './images/footprint.png';
+import { UserProvider, UserContext } from './UserContext';
 
 // 사이드바 핸들러 함수
 const openNav = () => {
-  document.getElementById("mySidenav").style.width = "200px";
+  document.getElementById('mySidenav').style.width = '200px';
 };
 
 const closeNav = () => {
-  document.getElementById("mySidenav").style.width = "0";
+  document.getElementById('mySidenav').style.width = '0';
 };
 
 const Sidebar = () => {
@@ -36,7 +42,11 @@ const Sidebar = () => {
 
   return (
     <div>
-      <span className="sidebtn" style={{ fontSize: "30px", cursor: "pointer" }} onClick={openNav}>
+      <span
+        className="sidebtn"
+        style={{ fontSize: '30px', cursor: 'pointer' }}
+        onClick={openNav}
+      >
         &#9776;
       </span>
       <div id="mySidenav" className="sidenav">
@@ -107,7 +117,9 @@ function App() {
                       username ? (
                         <div className="userInfo">
                           <span>{username}님</span>
-                          <button onClick={logout} className="logoutButton">로그아웃</button>
+                          <button onClick={logout} className="logoutButton">
+                            로그아웃
+                          </button>
                         </div>
                       ) : (
                         <Link to="/login" className="login">
@@ -135,24 +147,24 @@ function App() {
                       <div className="my-carbon">
                         <h2>나의 탄소 발자국</h2>
                         <div className="mainpage_chart">
-                          <div className="bar" style={{ height: "40%" }}>
+                          <div className="bar" style={{ height: '40%' }}>
                             12/01
                           </div>
-                          <div className="bar" style={{ height: "50%" }}>
+                          <div className="bar" style={{ height: '50%' }}>
                             12/02
                           </div>
-                          <div className="bar" style={{ height: "30%" }}>
+                          <div className="bar" style={{ height: '30%' }}>
                             12/03
                           </div>
-                          <div className="bar" style={{ height: "20%" }}>
+                          <div className="bar" style={{ height: '20%' }}>
                             12/04
                           </div>
-                          <div className="bar active" style={{ height: "70%" }}>
+                          <div className="bar active" style={{ height: '70%' }}>
                             12/05
                           </div>
                         </div>
                       </div>
-                      
+
                       <div className="goal-section">
                         <p>
                           한 달 내로 탄소 배출량을 10% 줄일 수 있을 것으로
@@ -203,7 +215,7 @@ function App() {
                           <h3 id="notice_txt">공지사항</h3>
                           <span className="notice_plus">+</span>
                           <div className="clear"></div>
-                          <hr style={{ width: "100%" }} />
+                          <hr style={{ width: '100%' }} />
                           <p>홈페이지 점검시간: 2024 - 11 - 20</p>
                         </div>
                       </div>
@@ -226,8 +238,19 @@ function App() {
               <Route path="/challengeWrite" element={<ChallengeWrite />} />
               <Route path="/challengeCheck" element={<ChallengeCheck />} />
 
-              <Route path="/mypage" element={<MyPage stampCount={stampCount} />} />
-              <Route path="/event" element={<EventPage stampCount={stampCount} setStampCount={setStampCount} />} />
+              <Route
+                path="/mypage"
+                element={<MyPage stampCount={stampCount} />}
+              />
+              <Route
+                path="/event"
+                element={
+                  <EventPage
+                    stampCount={stampCount}
+                    setStampCount={setStampCount}
+                  />
+                }
+              />
             </Routes>
           </main>
 
@@ -248,7 +271,6 @@ function App() {
               </div>
             </div>
           </footer>
-
         </div>
       </Router>
     </UserProvider>

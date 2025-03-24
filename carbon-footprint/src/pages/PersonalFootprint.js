@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Pie } from 'react-chartjs-2';
 import 'chart.js/auto';
-import './../sub_css/CarbonFootprint.css'; // 스타일 분리
+import './../sub_css/CarbonFootprint.css';
 
 const Sidebar = () => {
   return (
@@ -23,104 +23,112 @@ const Sidebar = () => {
 };
 
 const CarbonPieChart = () => {
-  const [distances, setDistances] = useState(null);
+  const [distances, setDistances] = useState({
+    car_distance: 0,
+    bus_distance: 0,
+    walk_distance: 0,
+  });
   const [predictedEmission, setPredictedEmission] = useState(null);
+  const [treesNeeded, setTreesNeeded] = useState(null); // 🌲 추가
   const [recommendations, setRecommendations] = useState([]);
   const [showRecommendations, setShowRecommendations] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        let userId = localStorage.getItem('userId');
+        if (!userId) {
+          console.warn('❌ 로그인된 사용자 ID 없음. 기본값 user1로 설정.');
+          userId = 'user1';
+          localStorage.setItem('userId', userId);
+        }
+
         const response = await fetch(
-          'http://127.0.0.1:8000/user_data?user_id=user1'
+          `http://127.0.0.1:8000/user_data?user_id=${userId}`
         );
+
         if (!response.ok)
-          throw new Error('사용자 데이터를 불러올 수 없습니다.');
+          throw new Error(
+            `사용자 데이터를 불러올 수 없습니다. 상태 코드: ${response.status}`
+          );
+
         const data = await response.json();
-        setDistances(data);
+
+        setDistances({
+          car_distance: data.car_distance || 0,
+          bus_distance: data.bus_distance || 0,
+          walk_distance: data.walk_distance || 0,
+        });
       } catch (error) {
-        console.error('❌ 사용자 데이터 가져오기 실패:', error);
+        console.error('❌ 사용자 데이터 가져오기 실패:', error.message);
       }
     };
 
-    fetchUserData(); // ✅ 처음 한 번 실행하여 데이터 불러오기
+    fetchUserData();
   }, []);
 
   useEffect(() => {
-    if (distances) {
-      fetchPredictedEmission(); // ✅ 예측 값 자동 업데이트
-      fetchRecommendations(); // ✅ 추천 값 자동 업데이트
+    if (distances.car_distance !== undefined) {
+      fetchPredictedEmission();
+      fetchRecommendations();
     }
   }, [distances]);
 
   const fetchPredictedEmission = async () => {
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/predict?${new URLSearchParams(
-          distances
-        ).toString()}`
-      );
+      const response = await fetch('http://127.0.0.1:8000/predict', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(distances),
+      });
+
       if (!response.ok)
         throw new Error('HTTP 오류! 상태 코드: ' + response.status);
+
       const data = await response.json();
       setPredictedEmission(data.predicted_emission);
     } catch (error) {
-      console.error('❌ API 호출 실패:', error);
+      console.error('❌ AI 모델 API 호출 실패:', error.message);
     }
   };
 
   const fetchRecommendations = async () => {
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/recommend?${new URLSearchParams(
-          distances
-        ).toString()}`
-      );
+      const response = await fetch('http://127.0.0.1:8000/recommend', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(distances),
+      });
+
       if (!response.ok)
         throw new Error('HTTP 오류! 상태 코드: ' + response.status);
+
       const data = await response.json();
       setRecommendations(data.recommendations);
+      setTreesNeeded(data.trees_needed); // 🌲 필요한 나무 수 저장
     } catch (error) {
-      console.error('❌ 추천 데이터 가져오기 실패:', error);
+      console.error('❌ 추천 데이터 API 호출 실패:', error.message);
     }
   };
 
   const handleShowRecommendations = () => {
-    fetchRecommendations(); // ✅ 버튼 클릭 시 최신 추천 요청
+    fetchRecommendations();
     setShowRecommendations(!showRecommendations);
   };
 
-  const pieData = distances
-    ? {
-        labels: ['자가용', '대중교통', '자전거', '도보', '기차'],
-        datasets: [
-          {
-            data: Object.values(distances),
-            backgroundColor: [
-              '#4caf50',
-              '#cddc39',
-              '#ff9800',
-              '#2196f3',
-              '#9c27b0',
-            ],
-          },
-        ],
-      }
-    : {
-        labels: ['자가용', '대중교통', '자전거', '도보', '기차'],
-        datasets: [
-          {
-            data: [1, 1, 1, 1, 1],
-            backgroundColor: [
-              '#4caf50',
-              '#cddc39',
-              '#ff9800',
-              '#2196f3',
-              '#9c27b0',
-            ],
-          },
-        ],
-      };
+  const pieData = {
+    labels: ['자가용', '대중교통', '도보'],
+    datasets: [
+      {
+        data: Object.values(distances),
+        backgroundColor: ['#4caf50', '#cddc39', '#2196f3'],
+      },
+    ],
+  };
 
   return (
     <div className="footprint_container">
@@ -133,10 +141,18 @@ const CarbonPieChart = () => {
           </div>
           <div className="prediction-info">
             {predictedEmission !== null && (
-              <p>
-                <strong>🚀 예측된 탄소 배출량 (AI 모델):</strong>{' '}
-                {predictedEmission.toFixed(2)} g CO₂
-              </p>
+              <>
+                <p>
+                  <strong>🚀 예측된 탄소 배출량 (AI 모델):</strong>{' '}
+                  {predictedEmission.toFixed(2)} g CO₂
+                </p>
+                {treesNeeded !== null && (
+                  <p>
+                    <strong>🌳 예상 배출량을 상쇄하려면 필요한 나무 수:</strong>{' '}
+                    {treesNeeded}그루
+                  </p>
+                )}
+              </>
             )}
             <button
               className="recommendation-button"
