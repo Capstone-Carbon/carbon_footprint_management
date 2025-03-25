@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const path = require("path");
+const axios = require("axios");
 require("dotenv").config();
 
 const app = express();
@@ -54,6 +55,58 @@ db.run(
   )`
 );
 
+// ✅ places 테이블 생성 (없으면 자동 생성)
+db.run(
+  `CREATE TABLE IF NOT EXISTS places (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    address TEXT NOT NULL,
+    latitude REAL NOT NULL,
+    longitude REAL NOT NULL
+  )`
+);
+
+// ✅ Kakao Map API를 사용하여 장소 데이터 가져오기
+const fetchPlacesFromKakao = async (query) => {
+  const url = `https://dapi.kakao.com/v2/local/search/keyword.json?query=${encodeURIComponent(query)}`;
+  const headers = {
+    Authorization: `KakaoAK ${process.env.KAKAO_REST_API_KEY}`,
+  };
+
+  try {
+    const response = await axios.get(url, { headers });
+    return response.data.documents;
+  } catch (error) {
+    console.error("Failed to fetch data from Kakao Map API:", error);
+    return [];
+  }
+};
+
+// ✅ 장소 데이터 저장 API
+app.post("/save-places", async (req, res) => {
+  const { query } = req.body;
+
+  if (!query) {
+    return res.status(400).json({ message: "Query is required" });
+  }
+
+  const places = await fetchPlacesFromKakao(query);
+
+  if (places.length === 0) {
+    return res.status(404).json({ message: "No places found" });
+  }
+
+  const insertPlace = db.prepare("INSERT INTO places (name, address, latitude, longitude) VALUES (?, ?, ?, ?)");
+
+  places.forEach((place) => {
+    insertPlace.run(place.place_name, place.address_name, place.y, place.x);
+  });
+
+  insertPlace.finalize();
+
+  res.status(201).json({ message: "Places saved successfully" });
+});
+
 // ✅ 회원가입 API
 app.post("/register", async (req, res) => {
   const { username, password } = req.body;
@@ -99,6 +152,12 @@ app.post("/login", (req, res) => {
     res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'Lax' });
     res.json({ message: "로그인 성공" });
   });
+});
+
+// ✅ 로그아웃 API
+app.post("/logout", (req, res) => {
+  res.clearCookie('token', { httpOnly: true, secure: false, sameSite: 'Lax' });
+  res.json({ message: "로그아웃 성공" });
 });
 
 // ✅ 사용자 이름 가져오기 API
@@ -149,6 +208,34 @@ app.get("/posts", (req, res) => {
   });
 });
 
+// ✅ 커뮤니티 글 상세 조회 API
+app.get("/posts/:id", (req, res) => {
+  const postId = req.params.id;
+  db.get("SELECT * FROM posts WHERE id = ?", [postId], (err, row) => {
+    if (err) {
+      return res.status(500).json({ message: "글 조회 실패", error: err.message });
+    }
+    if (!row) {
+      return res.status(404).json({ message: "글을 찾을 수 없습니다." });
+    }
+    res.json(row);
+  });
+});
+
+// ✅ 커뮤니티 글 삭제 API
+app.delete("/posts/:id", (req, res) => {
+  const postId = req.params.id;
+  db.run("DELETE FROM posts WHERE id = ?", [postId], function (err) {
+    if (err) {
+      return res.status(500).json({ message: "글 삭제 실패", error: err.message });
+    }
+    if (this.changes === 0) {
+      return res.status(404).json({ message: "글을 찾을 수 없습니다." });
+    }
+    res.status(200).json({ message: "글 삭제 성공" });
+  });
+});
+
 // ✅ 챌린지 글 작성 API
 app.post("/challenges", (req, res) => {
   const token = req.cookies.token;
@@ -180,6 +267,39 @@ app.get("/challenges", (req, res) => {
     }
     res.json(rows);
   });
+});
+
+// ✅ 챌린지 글 상세 조회 API
+app.get("/challenges/:id", (req, res) => {
+  const challengeId = req.params.id;
+  db.get("SELECT * FROM challenges WHERE id = ?", [challengeId], (err, row) => {
+    if (err) {
+      return res.status(500).json({ message: "챌린지 글 조회 실패", error: err.message });
+    }
+    if (!row) {
+      return res.status(404).json({ message: "챌린지 글을 찾을 수 없습니다." });
+    }
+    res.json(row);
+  });
+});
+
+// ✅ 탄소 배출량 예측 API
+app.post("/predict", (req, res) => {
+  const { car_distance, bus_distance, bike_distance, walk_distance, train_distance } = req.body;
+
+  // 모델 경로 설정
+  const modelPath = path.join(__dirname, "data", "carbon_model.pkl");
+
+  // 모델 불러오기
+  const model = joblib.load(modelPath);
+
+  // 입력 데이터 생성
+  const new_data = [[car_distance, bus_distance, bike_distance, walk_distance, train_distance]];
+
+  // 예측 실행
+  const predicted_emission = model.predict(new_data)[0];
+
+  res.json({ predicted_emission });
 });
 
 // ✅ 서버 실행

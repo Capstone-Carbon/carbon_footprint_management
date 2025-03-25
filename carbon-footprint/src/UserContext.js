@@ -24,9 +24,21 @@ export const UserProvider = ({ children }) => {
     fetchUsername();
   }, []);
 
-  const logout = () => {
-    setUsername("");
-    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  const logout = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (response.ok) {
+        setUsername("");
+        localStorage.removeItem("username");
+      } else {
+        console.error("Failed to logout");
+      }
+    } catch (error) {
+      console.error("Failed to logout:", error);
+    }
   };
 
   return (
