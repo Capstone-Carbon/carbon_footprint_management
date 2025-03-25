@@ -105,10 +105,15 @@ const CommunityPage = () => {
             </thead>
             <tbody>
               {posts.map((post) => (
-                <tr className="board-tr">
+                <tr
+                  className="board-tr"
+                >
                   <td className="board-th">{post.id}</td>
                   <td className="board-th">
-                    <Link to="/communityCheck" style={{ color: 'black' }}>
+                    <Link
+                      to={`/communityCheck/${post.id}`}
+                      style={{ color: 'black' }}
+                    >
                       {post.title}
                     </Link>
                   </td>
