@@ -233,10 +233,10 @@ function App() {
 
               <Route path="/community" element={<Community />} />
               <Route path="/communityWrite" element={<CommunityWrite />} />
-              <Route path="/communityCheck" element={<CommunityCheck />} />
+              <Route path="/communityCheck/:id" element={<CommunityCheck />} />
               <Route path="/challenge" element={<Challenge />} />
               <Route path="/challengeWrite" element={<ChallengeWrite />} />
-              <Route path="/challengeCheck" element={<ChallengeCheck />} />
+              <Route path="/challengeCheck/:id" element={<ChallengeCheck />} />
 
               <Route
                 path="/mypage"

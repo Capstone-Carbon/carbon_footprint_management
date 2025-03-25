@@ -69,7 +69,7 @@ const CommunityPage = () => {
               {rankings.map((item) => (
                 <tr className="ranking-tr" key={item.rank}>
                   <td className="ranking-th">{item.rank}</td>
-                  <td className="ranking-th"><Link to="/challengeCheck" style={{color:"black"}}>{item.title}</Link></td>
+                  <td className="ranking-th"><Link to={`/challengeCheck/${item.id}`} style={{color:"black"}}>{item.title}</Link></td>
                   <td className="ranking-th">{item.user}</td>
                 </tr>
               ))}
@@ -93,7 +93,7 @@ const CommunityPage = () => {
               {posts.map((post) => (
                 <tr className="board-tr" key={post.id}>
                   <td className="board-th">{post.id}</td>
-                  <td className="board-th"><Link to="/challengeCheck" style={{color:"black"}}>{post.title}</Link></td>
+                  <td className="board-th"><Link to={`/challengeCheck/${post.id}`} style={{color:"black"}}>{post.title}</Link></td>
                   <td className="board-th">{post.author}</td>
                 </tr>
               ))}

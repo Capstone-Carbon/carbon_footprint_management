@@ -1,2 +1,59 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-carbon-footprint-backend/users.db
+# dependencies
+/node_modules
+carbon-footprint/node_modules
+carbon-footprint-backend/node_modules
+
+# virtual environments
+.venv
+carbon-footprint/.venv
+carbon-footprint-backend/.venv
+
+# VSCode settings
+.vscode
+carbon-footprint/.vscode
+carbon-footprint-backend/.vscode
+
+# Python cache
+__pycache__
+carbon-footprint/__pycache__
+carbon-footprint-backend/__pycache__
+
+# testing
+/coverage
+carbon-footprint/coverage
+carbon-footprint-backend/coverage
+
+# production
+/build
+carbon-footprint/build
+carbon-footprint-backend/build
+
+# misc
+.DS_Store
+carbon-footprint/.DS_Store
+carbon-footprint-backend/.DS_Store
+
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+carbon-footprint/.env.local
+carbon-footprint/.env.development.local
+carbon-footprint/.env.test.local
+carbon-footprint/.env.production.local
+carbon-footprint-backend/.env.local
+carbon-footprint-backend/.env.development.local
+carbon-footprint-backend/.env.test.local
+carbon-footprint-backend/.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+carbon-footprint/npm-debug.log*
+carbon-footprint/yarn-debug.log*
+carbon-footprint/yarn-error.log*
+carbon-footprint-backend/npm-debug.log*
+carbon-footprint-backend/yarn-debug.log*
+carbon-footprint-backend/yarn-error.log*
