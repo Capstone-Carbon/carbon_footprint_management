@@ -1,35 +1,43 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import "./../sub_css/MyPage.css"; // 스타일 연결
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import './../sub_css/MyPage.css'; // 스타일 연결
 
 const Sidebar = () => {
   return (
     <div className="sidebar">
       <h2>MY PAGE</h2>
       <ul>
-        <li><Link to="/mypage" style={{ color: "#4CAF50" }}>MY 등급</Link></li>
+        <li>
+          <Link to="/mypage" style={{ color: '#4CAF50' }}>
+            MY 등급
+          </Link>
+        </li>
       </ul>
     </div>
   );
 };
 
 const MyPage = () => {
-  const maxStamps = 10; // 스탬프 최대 개수
-  
-  // ✅ LocalStorage에서 데이터 불러오기
+  const maxStamps = 10;
+
+  // ✅ 수정된 로컬 스토리지 로딩 함수 (JSON.parse 오류 방지)
   const getStoredValue = (key, defaultValue) => {
-    return localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : defaultValue;
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : defaultValue;
+    } catch (e) {
+      return localStorage.getItem(key) || defaultValue;
+    }
   };
 
-  const [stampCount, setStampCount] = useState(getStoredValue("stampCount", 0));
-  const [progress, setProgress] = useState(getStoredValue("progress", 0));
-  const [level, setLevel] = useState(getStoredValue("level", "BRONZE"));
+  const [stampCount, setStampCount] = useState(getStoredValue('stampCount', 0));
+  const [progress, setProgress] = useState(getStoredValue('progress', 0));
+  const [level, setLevel] = useState(getStoredValue('level', 'BRONZE'));
 
   useEffect(() => {
-    // ✅ 값 변경될 때마다 LocalStorage에 저장
-    localStorage.setItem("stampCount", JSON.stringify(stampCount));
-    localStorage.setItem("progress", JSON.stringify(progress));
-    localStorage.setItem("level", JSON.stringify(level));
+    localStorage.setItem('stampCount', JSON.stringify(stampCount));
+    localStorage.setItem('progress', JSON.stringify(progress));
+    localStorage.setItem('level', JSON.stringify(level));
   }, [stampCount, progress, level]);
 
   return (
@@ -38,7 +46,9 @@ const MyPage = () => {
       <div className="main-content">
         <h2>마이 등급</h2>
         <div className="level-section">
-          <p>현재 등급: <strong>{level}</strong></p>
+          <p>
+            현재 등급: <strong>{level}</strong>
+          </p>
           <div className="progress-container">
             <div className="progress-bar">
               <div className="progress" style={{ width: `${progress}%` }}></div>
@@ -51,7 +61,12 @@ const MyPage = () => {
         <div className="stamp-section">
           <div className="stamp-container">
             {Array.from({ length: maxStamps }).map((_, index) => (
-              <div key={index} className={`stamp ${index < stampCount ? "filled" : ""}`}>{index + 1}</div>
+              <div
+                key={index}
+                className={`stamp ${index < stampCount ? 'filled' : ''}`}
+              >
+                {index + 1}
+              </div>
             ))}
           </div>
         </div>
@@ -59,9 +74,15 @@ const MyPage = () => {
         <h2>내 쿠폰</h2>
         <div className="coupon-section">
           <p>현재 등급에 따른 쿠폰</p>
-          {level === "BRONZE" && <p>브론즈 등급 1000원 할인 쿠폰 (유효기간: 2025.01.31)</p>}
-          {level === "SILVER" && <p>실버 등급 3000원 할인 쿠폰 (유효기간: 2025.01.31)</p>}
-          {level === "GOLD" && <p>골드 등급 5000원 할인 쿠폰 (유효기간: 2025.01.31)</p>}
+          {level === 'BRONZE' && (
+            <p>브론즈 등급 1000원 할인 쿠폰 (유효기간: 2025.01.31)</p>
+          )}
+          {level === 'SILVER' && (
+            <p>실버 등급 3000원 할인 쿠폰 (유효기간: 2025.01.31)</p>
+          )}
+          {level === 'GOLD' && (
+            <p>골드 등급 5000원 할인 쿠폰 (유효기간: 2025.01.31)</p>
+          )}
         </div>
       </div>
     </div>

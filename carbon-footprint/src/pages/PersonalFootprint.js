@@ -143,7 +143,7 @@ const CarbonPieChart = () => {
             {predictedEmission !== null && (
               <>
                 <p>
-                  <strong>🚀 예측된 탄소 배출량 (AI 모델):</strong>{' '}
+                  <strong> 예측된 탄소 배출량 (AI 모델):</strong>{' '}
                   {predictedEmission.toFixed(2)} g CO₂
                 </p>
                 {treesNeeded !== null && (

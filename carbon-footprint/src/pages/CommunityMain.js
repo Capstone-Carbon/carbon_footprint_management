@@ -59,11 +59,6 @@ const CommunityPage = () => {
     navigate('/CommunityWrite');
   };
 
-  // 게시글 클릭 시 상세 페이지로 이동
-  const handlePostClick = (id) => {
-    navigate(`/CommunityDetail/${id}`);
-  };
-
   return (
     <div className="community_container">
       <Sidebar />
@@ -110,19 +105,10 @@ const CommunityPage = () => {
             </thead>
             <tbody>
               {posts.map((post) => (
-                <tr
-                  className="board-tr"
-                  key={post.id}
-                  onClick={() => handlePostClick(post.id)} // 클릭 시 상세 페이지 이동
-                  style={{ cursor: 'pointer' }} // 마우스 커서 변경
-                >
+                <tr className="board-tr">
                   <td className="board-th">{post.id}</td>
                   <td className="board-th">
-                    <Link
-                      to="/communityCheck"
-                      style={{ color: 'black' }}
-                      onClick={(event) => event.stopPropagation()}
-                    >
+                    <Link to="/communityCheck" style={{ color: 'black' }}>
                       {post.title}
                     </Link>
                   </td>
