@@ -162,18 +162,13 @@ app.get("/posts/:id", (req, res) => {
 // ✅ 커뮤니티 글 삭제 API
 app.delete("/posts/:id", (req, res) => {
   const postId = req.params.id;
-
   db.run("DELETE FROM posts WHERE id = ?", [postId], function (err) {
     if (err) {
-      console.error("글 삭제 실패:", err.message);
       return res.status(500).json({ message: "글 삭제 실패", error: err.message });
     }
-
     if (this.changes === 0) {
       return res.status(404).json({ message: "글을 찾을 수 없습니다." });
     }
-
-    console.log(`글 ID ${postId} 삭제 성공`);
     res.status(200).json({ message: "글 삭제 성공" });
   });
 });

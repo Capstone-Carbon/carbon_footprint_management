@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./../sub_css/CommunityCheck.css";
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"; 
 
 const Sidebar = () => {
   return (
@@ -48,7 +48,6 @@ const ChallengeDetailPage = () => {
       if (!response.ok) {
         throw new Error("챌린지 글 삭제 실패");
       }
-
       alert("챌린지 글이 삭제되었습니다."); // 알림 표시
       navigate("/challenge"); // 챌린지 페이지로 이동
     } catch (error) {
@@ -96,18 +95,9 @@ const ChallengeDetailPage = () => {
             </tbody>
           </table>
           <div id="views_buttons">
-            <Link to="/challenge" style={{ color: "black" }}>
-              <button className="catalog">목록</button>
-            </Link>
-            <button
-              className="catalog"
-              onClick={(e) => {
-                e.preventDefault(); // 기본 동작 방지
-                handleDelete();
-              }}
-            >
-              삭제
-            </button>
+            <Link to="/challenge" style={{ color: "black" } }><button className="catalog">
+            목록</button></Link>
+            <button className="catalog" onClick={handleDelete}>삭제</button>
           </div>
         </form>
       </div>
