@@ -44,69 +44,6 @@ db.run(
   )`
 );
 
-// ✅ challenges 테이블 생성 (없으면 자동 생성)
-db.run(
-  `CREATE TABLE IF NOT EXISTS challenges (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    detail TEXT NOT NULL,
-    author TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`
-);
-
-// ✅ places 테이블 생성 (없으면 자동 생성)
-db.run(
-  `CREATE TABLE IF NOT EXISTS places (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    address TEXT NOT NULL,
-    latitude REAL NOT NULL,
-    longitude REAL NOT NULL
-  )`
-);
-
-// ✅ Kakao Map API를 사용하여 장소 데이터 가져오기
-const fetchPlacesFromKakao = async (query) => {
-  const url = `https://dapi.kakao.com/v2/local/search/keyword.json?query=${encodeURIComponent(query)}`;
-  const headers = {
-    Authorization: `KakaoAK ${process.env.KAKAO_REST_API_KEY}`,
-  };
-
-  try {
-    const response = await axios.get(url, { headers });
-    return response.data.documents;
-  } catch (error) {
-    console.error("Failed to fetch data from Kakao Map API:", error);
-    return [];
-  }
-};
-
-// ✅ 장소 데이터 저장 API
-app.post("/save-places", async (req, res) => {
-  const { query } = req.body;
-
-  if (!query) {
-    return res.status(400).json({ message: "Query is required" });
-  }
-
-  const places = await fetchPlacesFromKakao(query);
-
-  if (places.length === 0) {
-    return res.status(404).json({ message: "No places found" });
-  }
-
-  const insertPlace = db.prepare("INSERT INTO places (name, address, latitude, longitude) VALUES (?, ?, ?, ?)");
-
-  places.forEach((place) => {
-    insertPlace.run(place.place_name, place.address_name, place.y, place.x);
-  });
-
-  insertPlace.finalize();
-
-  res.status(201).json({ message: "Places saved successfully" });
-});
-
 // ✅ 회원가입 API
 app.post("/register", async (req, res) => {
   const { username, password } = req.body;
@@ -225,81 +162,20 @@ app.get("/posts/:id", (req, res) => {
 // ✅ 커뮤니티 글 삭제 API
 app.delete("/posts/:id", (req, res) => {
   const postId = req.params.id;
+
   db.run("DELETE FROM posts WHERE id = ?", [postId], function (err) {
     if (err) {
+      console.error("글 삭제 실패:", err.message);
       return res.status(500).json({ message: "글 삭제 실패", error: err.message });
     }
+
     if (this.changes === 0) {
       return res.status(404).json({ message: "글을 찾을 수 없습니다." });
     }
+
+    console.log(`글 ID ${postId} 삭제 성공`);
     res.status(200).json({ message: "글 삭제 성공" });
   });
-});
-
-// ✅ 챌린지 글 작성 API
-app.post("/challenges", (req, res) => {
-  const token = req.cookies.token;
-  if (!token) {
-    return res.status(401).json({ message: "로그인 필요" });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const { title, detail } = req.body;
-    const author = decoded.username;
-
-    db.run("INSERT INTO challenges (title, detail, author) VALUES (?, ?, ?)", [title, detail, author], function (err) {
-      if (err) {
-        return res.status(500).json({ message: "챌린지 글 작성 실패", error: err.message });
-      }
-      res.status(201).json({ message: "챌린지 글 작성 성공", challengeId: this.lastID });
-    });
-  } catch (error) {
-    res.status(401).json({ message: "유효하지 않은 토큰" });
-  }
-});
-
-// ✅ 챌린지 글 목록 조회 API
-app.get("/challenges", (req, res) => {
-  db.all("SELECT * FROM challenges ORDER BY created_at DESC", [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ message: "챌린지 글 목록 조회 실패", error: err.message });
-    }
-    res.json(rows);
-  });
-});
-
-// ✅ 챌린지 글 상세 조회 API
-app.get("/challenges/:id", (req, res) => {
-  const challengeId = req.params.id;
-  db.get("SELECT * FROM challenges WHERE id = ?", [challengeId], (err, row) => {
-    if (err) {
-      return res.status(500).json({ message: "챌린지 글 조회 실패", error: err.message });
-    }
-    if (!row) {
-      return res.status(404).json({ message: "챌린지 글을 찾을 수 없습니다." });
-    }
-    res.json(row);
-  });
-});
-
-// ✅ 탄소 배출량 예측 API
-app.post("/predict", (req, res) => {
-  const { car_distance, bus_distance, bike_distance, walk_distance, train_distance } = req.body;
-
-  // 모델 경로 설정
-  const modelPath = path.join(__dirname, "data", "carbon_model.pkl");
-
-  // 모델 불러오기
-  const model = joblib.load(modelPath);
-
-  // 입력 데이터 생성
-  const new_data = [[car_distance, bus_distance, bike_distance, walk_distance, train_distance]];
-
-  // 예측 실행
-  const predicted_emission = model.predict(new_data)[0];
-
-  res.json({ predicted_emission });
 });
 
 // ✅ 서버 실행

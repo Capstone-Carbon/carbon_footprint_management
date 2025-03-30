@@ -66,7 +66,7 @@ function Join() {
       }
 
       alert("회원가입이 완료되었습니다!");
-      window.location.href="/login"
+      window.location.href = "/login";
     } catch (error) {
       setErrorMessage("서버 오류: " + error.message);
     }

@@ -48,6 +48,7 @@ const CommunityDetailPage = () => {
       if (!response.ok) {
         throw new Error("글 삭제 실패");
       }
+
       alert("게시글이 삭제되었습니다."); // 알림 표시
       navigate("/community"); // 커뮤니티 페이지로 이동
     } catch (error) {
@@ -68,6 +69,7 @@ const CommunityDetailPage = () => {
       <Sidebar />
       <div className="main-content">
         <h2>게시글 조회</h2>
+
         <form>
           <table id="detailTable">
             <tbody>
@@ -78,7 +80,7 @@ const CommunityDetailPage = () => {
                 <td id="author">{post.author}</td>
                 <td id="views">
                   <span>조회수</span>
-                  <span>&nbsp; {post.views}</span>
+                  <span id="views_number"> 0</span>
                 </td>
                 <div className="clear"></div>
               </tr>
@@ -92,7 +94,15 @@ const CommunityDetailPage = () => {
             <Link to="/community" style={{ color: "black" }}>
               <button className="catalog">목록</button>
             </Link>
-            <button className="catalog" onClick={handleDelete}>삭제</button>
+            <button
+              className="catalog"
+              onClick={(e) => {
+                e.preventDefault(); // 기본 동작 방지
+                handleDelete();
+              }}
+            >
+              삭제
+            </button>
           </div>
         </form>
       </div>
