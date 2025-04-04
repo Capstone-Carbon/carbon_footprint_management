@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Pie } from 'react-chartjs-2';
 import 'chart.js/auto';
 import './../sub_css/CarbonFootprint.css';
+import { UserContext } from '../UserContext';
 
 const Sidebar = () => {
   return (
@@ -23,67 +24,45 @@ const Sidebar = () => {
 };
 
 const CarbonPieChart = () => {
+  const { username } = useContext(UserContext);
   const [distances, setDistances] = useState({
     car_distance: 0,
     bus_distance: 0,
     walk_distance: 0,
   });
   const [predictedEmission, setPredictedEmission] = useState(null);
-  const [treesNeeded, setTreesNeeded] = useState(null); // 🌲 추가
+  const [treesNeeded, setTreesNeeded] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
   const [showRecommendations, setShowRecommendations] = useState(false);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        let userId = localStorage.getItem('userId');
-        if (!userId) {
-          console.warn('❌ 로그인된 사용자 ID 없음. 기본값 user1로 설정.');
-          userId = 'user1';
-          localStorage.setItem('userId', userId);
-        }
+  const fetchUserData = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      if (!userId) return;
 
-        const response = await fetch(
-          `http://127.0.0.1:8000/user_data?user_id=${userId}`
-        );
+      const response = await fetch(
+        `http://127.0.0.1:8000/user_data?user_id=${userId}`
+      );
+      if (!response.ok) throw new Error(`상태 코드: ${response.status}`);
 
-        if (!response.ok)
-          throw new Error(
-            `사용자 데이터를 불러올 수 없습니다. 상태 코드: ${response.status}`
-          );
-
-        const data = await response.json();
-
-        setDistances({
-          car_distance: data.car_distance || 0,
-          bus_distance: data.bus_distance || 0,
-          walk_distance: data.walk_distance || 0,
-        });
-      } catch (error) {
-        console.error('❌ 사용자 데이터 가져오기 실패:', error.message);
-      }
-    };
-
-    fetchUserData();
-  }, []);
-
-  useEffect(() => {
-    if (distances.car_distance !== undefined) {
-      fetchPredictedEmission();
-      fetchRecommendations();
+      const data = await response.json();
+      setDistances({
+        car_distance: data.car_distance || 0,
+        bus_distance: data.bus_distance || 0,
+        walk_distance: data.walk_distance || 0,
+      });
+    } catch (error) {
+      console.error('❌ 사용자 데이터 가져오기 실패:', error.message);
     }
-  }, [distances]);
+  };
 
   const fetchPredictedEmission = async () => {
     try {
       const response = await fetch('http://127.0.0.1:8000/predict', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(distances),
       });
-
       if (!response.ok)
         throw new Error('HTTP 오류! 상태 코드: ' + response.status);
 
@@ -98,22 +77,30 @@ const CarbonPieChart = () => {
     try {
       const response = await fetch('http://127.0.0.1:8000/recommend', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(distances),
       });
-
       if (!response.ok)
         throw new Error('HTTP 오류! 상태 코드: ' + response.status);
 
       const data = await response.json();
       setRecommendations(data.recommendations);
-      setTreesNeeded(data.trees_needed); // 🌲 필요한 나무 수 저장
+      setTreesNeeded(data.trees_needed);
     } catch (error) {
       console.error('❌ 추천 데이터 API 호출 실패:', error.message);
     }
   };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    if (distances.car_distance !== undefined) {
+      fetchPredictedEmission();
+      fetchRecommendations();
+    }
+  }, [distances]);
 
   const handleShowRecommendations = () => {
     fetchRecommendations();
@@ -130,46 +117,77 @@ const CarbonPieChart = () => {
     ],
   };
 
+  if (!username || !localStorage.getItem('userId')) {
+    return (
+      <div className="footprint_container">
+        <Sidebar />
+        <div className="main-content">
+          <h2>개인 탄소 배출량 분석</h2>
+          <div
+            style={{
+              backgroundColor: '#fffbe6',
+              padding: '1rem',
+              border: '1px solid #ffd700',
+              borderRadius: '8px',
+              color: '#333',
+              textAlign: 'center',
+              marginTop: '2rem',
+            }}
+          >
+            <p style={{ margin: 0, fontSize: '1.1rem' }}>
+              <strong>로그인이 필요합니다.</strong>
+              <br />
+              로그인 후 탄소 발자국 분석을 이용하실 수 있어요.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="footprint_container">
       <Sidebar />
       <div className="main-content">
         <h2>개인 탄소 배출량 분석</h2>
-        <div className="chart-prediction-wrapper">
-          <div className="chart2-container">
-            {pieData && <Pie data={pieData} />}
+        <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+          <div style={{ width: '280px', height: '280px' }}>
+            <Pie data={pieData} options={{ maintainAspectRatio: false }} />
           </div>
-          <div className="prediction-info">
+          <div>
             {predictedEmission !== null && (
               <>
-                <p>
-                  <strong> 예측된 탄소 배출량 (AI 모델):</strong>{' '}
-                  {predictedEmission.toFixed(2)} g CO₂
+                <p style={{ fontSize: '1.1rem' }}>
+                  🌿 <strong>예측된 탄소 배출량:</strong>{' '}
+                  {(predictedEmission / 1000).toFixed(2)} kg CO₂
                 </p>
                 {treesNeeded !== null && (
-                  <p>
-                    <strong>🌳 예상 배출량을 상쇄하려면 필요한 나무 수:</strong>{' '}
+                  <p style={{ fontSize: '1.1rem' }}>
+                    🌳 <strong>예상 배출량을 상쇄하려면 필요한 나무 수:</strong>{' '}
                     {treesNeeded}그루
                   </p>
                 )}
               </>
             )}
-            <button
-              className="recommendation-button"
-              onClick={handleShowRecommendations}
-            >
-              탄소 절감 추천 보기
-            </button>
-            {showRecommendations && recommendations.length > 0 && (
-              <div className="recommendations">
-                <ul>
-                  {recommendations.map((rec, index) => (
-                    <li key={index}>{rec}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
           </div>
+        </div>
+        <div style={{ marginTop: '2rem' }}>
+          <button
+            className="recommendation-button"
+            onClick={handleShowRecommendations}
+          >
+            탄소 절감 추천 보기
+          </button>
+          {showRecommendations && recommendations.length > 0 && (
+            <div className="recommendations">
+              <h3>🌱 탄소 절감 가이드</h3>
+              <ul>
+                {recommendations.map((rec, index) => (
+                  <li key={index}>{rec}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </div>
