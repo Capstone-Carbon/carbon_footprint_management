@@ -1,15 +1,18 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "./../sub_css/CommunityWrite.css"; // 스타일 분리
-import { Link } from "react-router-dom"; // ✅ 추가해야 함
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './../sub_css/CommunityWrite.css';
+import { Link } from 'react-router-dom';
 
 const Sidebar = () => {
   return (
     <div className="sidebar">
       <h2>커뮤니티</h2>
       <ul>
-        <li><Link to="/community" style={{ color: "#4CAF50" }}>커뮤니티</Link></li>
-        <li><Link to="/challenge">챌린지</Link></li> {/* Link 수정됨 */}
+        <li>
+          <Link to="/community" style={{ color: '#4CAF50' }}>
+            커뮤니티
+          </Link>
+        </li>
       </ul>
     </div>
   );
@@ -17,7 +20,7 @@ const Sidebar = () => {
 
 const CommunityWritePage = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ title: "", detail: "" });
+  const [formData, setFormData] = useState({ title: '', detail: '' });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,25 +28,25 @@ const CommunityWritePage = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // 기본 폼 제출 방지
+    e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+      const response = await fetch('http://localhost:5000/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
-        throw new Error("글 작성 실패");
+        throw new Error('글 작성 실패');
       }
 
-      alert("작성 완료!");
-      navigate("/community"); // 글 작성 후 커뮤니티 페이지로 이동
+      alert('작성 완료!');
+      navigate('/community');
     } catch (error) {
-      console.error("Failed to submit post:", error);
-      alert("글 작성 실패");
+      console.error('Failed to submit post:', error);
+      alert('글 작성 실패');
     }
   };
 
@@ -86,7 +89,9 @@ const CommunityWritePage = () => {
               </tr>
               <tr>
                 <td>
-                  <button className="register" type="submit">등록</button>
+                  <button className="register" type="submit">
+                    등록
+                  </button>
                 </td>
               </tr>
             </tbody>

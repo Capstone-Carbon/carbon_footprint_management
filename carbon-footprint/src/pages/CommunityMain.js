@@ -17,12 +17,6 @@ const Sidebar = () => {
             커뮤니티
           </Link>
         </li>
-        <li>
-          <Link to="/challenge" id="side_challenge">
-            챌린지
-          </Link>
-        </li>{' '}
-        {/* Link 수정됨 */}
       </ul>
     </div>
   );
@@ -31,13 +25,11 @@ const Sidebar = () => {
 const CommunityPage = () => {
   const navigate = useNavigate();
 
-  // 랭킹 데이터 (예제) ==> 예제니깐 서버랑 연동해서 sql title, user 가져와서 수정해야함
   const rankings = [
     { rank: 1, title: '탄소배출량 줄이는 방법 추천!', user: '⭕⭕⭕' },
     { rank: 2, title: '가정 속 탄소 줄이기!', user: 'ㄱㄴㄷ' },
   ];
 
-  // 게시판 글 데이터
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
@@ -54,7 +46,6 @@ const CommunityPage = () => {
     fetchPosts();
   }, []);
 
-  // 글쓰기 페이지로 이동
   const handleJoinClick = () => {
     navigate('/CommunityWrite');
   };
@@ -105,9 +96,7 @@ const CommunityPage = () => {
             </thead>
             <tbody>
               {posts.map((post) => (
-                <tr
-                  className="board-tr"
-                >
+                <tr className="board-tr" key={post.id}>
                   <td className="board-th">{post.id}</td>
                   <td className="board-th">
                     <Link
