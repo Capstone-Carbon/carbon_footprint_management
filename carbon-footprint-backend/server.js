@@ -261,6 +261,96 @@ app.post('/posts/:id/views', (req, res) => {
   );
 });
 
+// ✅ 댓글 목록 조회 API
+app.get('/posts/:id/comments', (req, res) => {
+  const postId = req.params.id;
+  db.all(
+    'SELECT * FROM comments WHERE post_id = ? ORDER BY created_at ASC',
+    [postId],
+    (err, rows) => {
+      if (err) return res.status(500).json({ message: '댓글 조회 실패' });
+      res.json(rows);
+    }
+  );
+});
+
+app.post('/posts/:id/comments', (req, res) => {
+  const postId = req.params.id;
+  const { author, text } = req.body;
+
+  // 🔒 값이 비었을 경우 오류 방지
+  if (!author || !text) {
+    return res
+      .status(400)
+      .json({ message: '작성자 또는 내용이 비어 있습니다.' });
+  }
+
+  db.run(
+    'INSERT INTO comments (post_id, author, text) VALUES (?, ?, ?)',
+    [postId, author, text],
+    function (err) {
+      if (err) {
+        console.error('❌ 댓글 작성 실패:', err.message); // 콘솔에 로그 출력
+        return res
+          .status(500)
+          .json({ message: '댓글 작성 실패', error: err.message });
+      }
+      res
+        .status(201)
+        .json({ message: '댓글 작성 성공', commentId: this.lastID });
+    }
+  );
+});
+
+// ✅ 댓글 삭제 API
+app.delete('/comments/:id', (req, res) => {
+  const commentId = req.params.id;
+
+  db.run('DELETE FROM comments WHERE id = ?', [commentId], function (err) {
+    if (err) {
+      return res
+        .status(500)
+        .json({ message: '댓글 삭제 실패', error: err.message });
+    }
+
+    if (this.changes === 0) {
+      return res.status(404).json({ message: '해당 댓글을 찾을 수 없습니다.' });
+    }
+
+    res.status(200).json({ message: '댓글 삭제 성공' });
+  });
+});
+
+// ✅ 댓글 수정 API
+app.put('/comments/:id', (req, res) => {
+  const commentId = req.params.id;
+  const { text } = req.body;
+
+  if (!text) {
+    return res.status(400).json({ message: '수정할 내용이 없습니다.' });
+  }
+
+  db.run(
+    'UPDATE comments SET text = ? WHERE id = ?',
+    [text, commentId],
+    function (err) {
+      if (err) {
+        return res
+          .status(500)
+          .json({ message: '댓글 수정 실패', error: err.message });
+      }
+
+      if (this.changes === 0) {
+        return res
+          .status(404)
+          .json({ message: '해당 댓글을 찾을 수 없습니다.' });
+      }
+
+      res.status(200).json({ message: '댓글 수정 성공' });
+    }
+  );
+});
+
 // ✅ 서버 실행
 app.listen(PORT, () => {
   console.log(`🚀 서버 실행 중: http://localhost:${PORT}`);
