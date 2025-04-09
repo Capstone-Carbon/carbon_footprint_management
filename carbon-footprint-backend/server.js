@@ -200,6 +200,18 @@ app.get('/posts', (req, res) => {
   });
 });
 
+// ✅ 조회수 기준 랭킹 TOP 2 가져오기
+app.get('/posts/top', (req, res) => {
+  db.all('SELECT * FROM posts ORDER BY views DESC LIMIT 2', [], (err, rows) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ message: '랭킹 조회 실패', error: err.message });
+    }
+    res.json(rows); // ✅ 반드시 배열로 반환!
+  });
+});
+
 // ✅ 커뮤니티 글 상세 조회 API
 app.get('/posts/:id', (req, res) => {
   const postId = req.params.id;
@@ -230,6 +242,23 @@ app.delete('/posts/:id', (req, res) => {
     }
     res.status(200).json({ message: '글 삭제 성공' });
   });
+});
+
+// ✅ 조회수 증가 API 추가
+app.post('/posts/:id/views', (req, res) => {
+  const postId = req.params.id;
+  db.run(
+    'UPDATE posts SET views = views + 1 WHERE id = ?',
+    [postId],
+    function (err) {
+      if (err) {
+        return res
+          .status(500)
+          .json({ message: '조회수 증가 실패', error: err.message });
+      }
+      res.status(200).json({ message: '조회수 증가 성공' });
+    }
+  );
 });
 
 // ✅ 서버 실행
