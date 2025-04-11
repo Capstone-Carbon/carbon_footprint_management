@@ -57,3 +57,4 @@ carbon-footprint/yarn-error.log*
 carbon-footprint-backend/npm-debug.log*
 carbon-footprint-backend/yarn-debug.log*
 carbon-footprint-backend/yarn-error.log*
+carbon-footprint-backend/users.db

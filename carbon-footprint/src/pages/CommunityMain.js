@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './../sub_css/Community.css'; // 스타일 분리
-import { color } from 'chart.js/helpers';
+import './../sub_css/Community.css';
 
 const Sidebar = () => {
   return (
@@ -17,12 +16,6 @@ const Sidebar = () => {
             커뮤니티
           </Link>
         </li>
-        <li>
-          <Link to="/challenge" id="side_challenge">
-            챌린지
-          </Link>
-        </li>{' '}
-        {/* Link 수정됨 */}
       </ul>
     </div>
   );
@@ -31,14 +24,16 @@ const Sidebar = () => {
 const CommunityPage = () => {
   const navigate = useNavigate();
 
-  // 랭킹 데이터 (예제) ==> 예제니깐 서버랑 연동해서 sql title, user 가져와서 수정해야함
-  const rankings = [
-    { rank: 1, title: '탄소배출량 줄이는 방법 추천!', user: '⭕⭕⭕' },
-    { rank: 2, title: '가정 속 탄소 줄이기!', user: 'ㄱㄴㄷ' },
-  ];
-
-  // 게시판 글 데이터
   const [posts, setPosts] = useState([]);
+  const [rankings, setRankings] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 5;
+
+  const totalPages = Math.ceil(posts.length / postsPerPage);
+  const currentPosts = posts.slice(
+    (currentPage - 1) * postsPerPage,
+    currentPage * postsPerPage
+  );
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -47,16 +42,41 @@ const CommunityPage = () => {
         const data = await response.json();
         setPosts(data);
       } catch (error) {
-        console.error('Failed to fetch posts:', error);
+        console.error('❌ 게시글 조회 실패:', error);
+      }
+    };
+
+    const fetchRankings = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/posts/top');
+        const data = await response.json();
+        console.log('🔥 랭킹 데이터:', data);
+        setRankings(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('❌ 랭킹 조회 실패:', error);
+        setRankings([]);
       }
     };
 
     fetchPosts();
+    fetchRankings();
   }, []);
 
-  // 글쓰기 페이지로 이동
   const handleJoinClick = () => {
     navigate('/CommunityWrite');
+  };
+
+  const formatDate = (dateStr) => {
+    const d = new Date(dateStr);
+    return `${d.getFullYear()}-${(d.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+  };
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   return (
@@ -65,7 +85,7 @@ const CommunityPage = () => {
       <div className="main-content">
         <h2>커뮤니티</h2>
 
-        {/* 랭킹 섹션 */}
+        {/* RANK 섹션 */}
         <div className="ranking-section">
           <h3>RANK</h3>
           <table>
@@ -74,18 +94,25 @@ const CommunityPage = () => {
                 <th>순위</th>
                 <th>글 제목</th>
                 <th>작성자</th>
+                <th>작성일</th>
+                <th>조회수</th>
               </tr>
             </thead>
             <tbody>
-              {rankings.map((item) => (
-                <tr className="ranking-tr" key={item.rank}>
-                  <td className="ranking-th">{item.rank}</td>
+              {rankings.map((item, index) => (
+                <tr className="ranking-tr" key={item.id}>
+                  <td className="ranking-th">{index + 1}</td>
                   <td className="ranking-th">
-                    <Link to="/communityCheck" style={{ color: 'black' }}>
+                    <Link
+                      to={`/communityCheck/${item.id}`}
+                      style={{ color: 'black' }}
+                    >
                       {item.title}
                     </Link>
                   </td>
-                  <td className="ranking-th">{item.user}</td>
+                  <td className="ranking-th">{item.author}</td>
+                  <td className="ranking-th">{formatDate(item.created_at)}</td>
+                  <td className="ranking-th">{item.views}</td>
                 </tr>
               ))}
             </tbody>
@@ -98,16 +125,16 @@ const CommunityPage = () => {
           <table>
             <thead>
               <tr className="board-tr">
-                <th className="ranking-th">목록</th>
+                <th className="ranking-th">번호</th>
                 <th className="ranking-th">글</th>
                 <th className="ranking-th">작성자</th>
+                <th className="ranking-th">작성일</th>
+                <th className="ranking-th">조회수</th>
               </tr>
             </thead>
             <tbody>
-              {posts.map((post) => (
-                <tr
-                  className="board-tr"
-                >
+              {currentPosts.map((post) => (
+                <tr className="board-tr" key={post.id}>
                   <td className="board-th">{post.id}</td>
                   <td className="board-th">
                     <Link
@@ -118,19 +145,42 @@ const CommunityPage = () => {
                     </Link>
                   </td>
                   <td className="board-th">{post.author}</td>
+                  <td className="board-th">{formatDate(post.created_at)}</td>
+                  <td className="board-th">{post.views}</td>
                 </tr>
               ))}
             </tbody>
           </table>
 
+          {/* 페이지 네비게이션 */}
           <div className="community-number">
-            <button className="number">&lt;</button>
-            <button className="number">1</button>
-            <button className="number">2</button>
-            <button className="number">3</button>
-            <button className="number">&gt;</button>
+            <button
+              className="number"
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
+              &lt;
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i + 1}
+                className="number"
+                onClick={() => handlePageChange(i + 1)}
+                style={{
+                  fontWeight: currentPage === i + 1 ? 'bold' : 'normal',
+                }}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              className="number"
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
+              &gt;
+            </button>
           </div>
 
+          {/* 글쓰기 버튼 */}
           <div className="post">
             <button type="button" className="write" onClick={handleJoinClick}>
               글쓰기

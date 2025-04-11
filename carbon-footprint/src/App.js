@@ -14,9 +14,10 @@ import CompanyFootprint from './pages/CompanyFootprint';
 import Community from './pages/CommunityMain';
 import CommunityWrite from './pages/CommunityWrite';
 import CommunityCheck from './pages/CommunityCheck';
-import Challenge from './pages/ChallengeMain';
-import ChallengeWrite from './pages/ChallengeWrite';
-import ChallengeCheck from './pages/ChallengeCheck';
+// ✅ Challenge 관련 import 제거
+// import Challenge from './pages/ChallengeMain';
+// import ChallengeWrite from './pages/ChallengeWrite';
+// import ChallengeCheck from './pages/ChallengeCheck';
 import EventPage from './pages/EventMain';
 import MyPage from './pages/MypageMain';
 import footprint from './images/footprint.png';
@@ -35,7 +36,6 @@ const Sidebar = () => {
   const location = useLocation();
   const { username } = useContext(UserContext);
 
-  // 📌 페이지 이동 시 자동으로 사이드바 닫기
   useEffect(() => {
     closeNav();
   }, [location]);
@@ -78,7 +78,7 @@ const Sidebar = () => {
 };
 
 function App() {
-  const [stampCount, setStampCount] = useState(3); // 스탬프 개수 관리
+  const [stampCount, setStampCount] = useState(3);
 
   return (
     <UserProvider>
@@ -103,7 +103,8 @@ function App() {
                     </Link>
                     <div className="dropdown_menu">
                       <Link to="/community">커뮤니티</Link>
-                      <Link to="/challenge">챌린지</Link>
+                      {/* ✅ 챌린지 메뉴 제거 */}
+                      {/* <Link to="/challenge">챌린지</Link> */}
                     </div>
                   </div>
                   <Link to="/event" className="main_menu">
@@ -138,7 +139,6 @@ function App() {
           {/* Main */}
           <main>
             <Routes>
-              {/* 기본 경로 */}
               <Route
                 path="/"
                 element={
@@ -227,16 +227,16 @@ function App() {
               {/* 페이지 경로 */}
               <Route path="/login" element={<LoginForm />} />
               <Route path="/join" element={<Join />} />
-
               <Route path="/personal" element={<PersonalFootprint />} />
               <Route path="/company" element={<CompanyFootprint />} />
 
               <Route path="/community" element={<Community />} />
               <Route path="/communityWrite" element={<CommunityWrite />} />
               <Route path="/communityCheck/:id" element={<CommunityCheck />} />
-              <Route path="/challenge" element={<Challenge />} />
+              {/* ✅ 챌린지 라우팅 제거 */}
+              {/* <Route path="/challenge" element={<Challenge />} />
               <Route path="/challengeWrite" element={<ChallengeWrite />} />
-              <Route path="/challengeCheck/:id" element={<ChallengeCheck />} />
+              <Route path="/challengeCheck/:id" element={<ChallengeCheck />} /> */}
 
               <Route
                 path="/mypage"
