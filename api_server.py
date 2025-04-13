@@ -44,7 +44,7 @@ def initialize_database():
 initialize_database()
 
 # ✅ AI 모델 로드
-MODEL_PATH_PKL = os.path.join("data", "best_carbon_model.pkl")
+MODEL_PATH_PKL = os.path.join("data", "carbon_model.pkl")
 MODEL_PATH_KERAS = os.path.join("data", "best_carbon_model.keras")
 
 def load_model():

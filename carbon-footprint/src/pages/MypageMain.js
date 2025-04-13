@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import './../sub_css/MyPage.css'; // 스타일 연결
+import './../sub_css/MyPage.css';
 
 const Sidebar = () => {
   return (
@@ -20,7 +20,6 @@ const Sidebar = () => {
 const MyPage = () => {
   const maxStamps = 10;
 
-  // ✅ 수정된 로컬 스토리지 로딩 함수 (JSON.parse 오류 방지)
   const getStoredValue = (key, defaultValue) => {
     try {
       const item = localStorage.getItem(key);
@@ -31,9 +30,24 @@ const MyPage = () => {
   };
 
   const [stampCount, setStampCount] = useState(getStoredValue('stampCount', 0));
-  const [progress, setProgress] = useState(getStoredValue('progress', 0));
-  const [level, setLevel] = useState(getStoredValue('level', 'BRONZE'));
+  const [progress, setProgress] = useState(0);
+  const [level, setLevel] = useState('BRONZE');
 
+  // 🔁 stampCount 바뀔 때 등급/진행률 자동 계산
+  useEffect(() => {
+    const percentage = Math.min((stampCount / maxStamps) * 100, 100);
+    setProgress(Math.round(percentage));
+
+    if (stampCount >= 8) {
+      setLevel('GOLD');
+    } else if (stampCount >= 5) {
+      setLevel('SILVER');
+    } else {
+      setLevel('BRONZE');
+    }
+  }, [stampCount]);
+
+  // 🔒 저장
   useEffect(() => {
     localStorage.setItem('stampCount', JSON.stringify(stampCount));
     localStorage.setItem('progress', JSON.stringify(progress));
@@ -46,9 +60,7 @@ const MyPage = () => {
       <div className="main-content">
         <h2>마이 등급</h2>
         <div className="level-section">
-          <p>
-            현재 등급: <strong>{level}</strong>
-          </p>
+          <p>현재 등급: <strong>{level}</strong></p>
           <div className="progress-container">
             <div className="progress-bar">
               <div className="progress" style={{ width: `${progress}%` }}></div>

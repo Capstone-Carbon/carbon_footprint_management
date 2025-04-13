@@ -1,52 +1,86 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "./../sub_css/Event.css"; // 스타일 파일 연결
+import "./../sub_css/Event.css";
 
 const Sidebar = () => {
   return (
     <div className="sidebar">
       <h2>이벤트</h2>
       <ul>
-        <li><Link to="/event" style={{ color: "#4CAF50" }}>이벤트 응모</Link></li>
+        <li>
+          <Link to="/event" style={{ color: "#4CAF50" }}>이벤트 응모</Link>
+        </li>
       </ul>
     </div>
   );
 };
 
-
 const EventPage = () => {
-  const [receipt, setReceipt] = useState(null);
-  const [preview, setPreview] = useState(null);
+  const [markImage, setMarkImage] = useState(null);
+  const [receiptImage, setReceiptImage] = useState(null);
+  const [markPreview, setMarkPreview] = useState(null);
+  const [receiptPreview, setReceiptPreview] = useState(null);
   const [feedback, setFeedback] = useState("");
 
   useEffect(() => {
-    // 스탬프 개수를 LocalStorage에서 불러오기
     const storedStamps = localStorage.getItem("stampCount");
-    if (!storedStamps) {
-      localStorage.setItem("stampCount", "0");
-    }
+    if (!storedStamps) localStorage.setItem("stampCount", "0");
   }, []);
 
-  const handleFileChange = (e) => {
+  const handleMarkChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setReceipt(file);
-      setPreview(URL.createObjectURL(file));
+      setMarkImage(file);
+      setMarkPreview(URL.createObjectURL(file));
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleReceiptChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setReceiptImage(file);
+      setReceiptPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!receipt) {
-      setFeedback("⚠️ 영수증을 업로드해주세요.");
+
+    if (!markImage || !receiptImage) {
+      setFeedback("⚠️ 마크 이미지와 영수증 이미지를 모두 업로드해주세요.");
       return;
     }
 
-    // ✅ 기존 스탬프 개수를 가져와서 1 증가
-    let currentStamp = parseInt(localStorage.getItem("stampCount") || "0", 10);
-    localStorage.setItem("stampCount", (currentStamp + 1).toString());
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      setFeedback("⚠️ 로그인 정보가 없습니다. 먼저 로그인 해주세요.");
+      return;
+    }
 
-    setFeedback("✅ 응모가 완료되었습니다! 스탬프 +1 적립 🎉");
+    const formData = new FormData();
+    formData.append("user_id", userId);
+    formData.append("mark_img", markImage);      // ✅ 여기를 백엔드와 일치
+    formData.append("receipt_img", receiptImage); // ✅ 여기도 백엔드와 일치
+
+    try {
+      const response = await fetch("http://localhost:8000/verify_receipt?user_id=" + userId, {
+        method: "POST",
+        body: formData
+      });      
+
+      const result = await response.json();
+
+      if (result.valid) {
+        let currentStamp = parseInt(localStorage.getItem("stampCount") || "0", 10);
+        localStorage.setItem("stampCount", (currentStamp + 1).toString());
+        setFeedback("✅ 인증 성공! 스탬프 +1 🎉");
+      } else {
+        setFeedback("❌ 인증 실패. 올바른 마크와 영수증을 업로드해주세요.");
+      }
+    } catch (error) {
+      console.error("서버 오류:", error);
+      setFeedback("🚨 서버 오류가 발생했습니다.");
+    }
   };
 
   return (
@@ -57,35 +91,30 @@ const EventPage = () => {
         <div className="eventComponent">
           <div className="event-guide">
             <h2>📢 이벤트 응모 안내</h2>
-            <p>
-              저탄소 인증 제품을 구매하고 스탬프를 적립하세요! 응모 방법은 다음과 같습니다.
-            </p>
+            <p>저탄소 인증 제품을 구매하고 스탬프를 적립하세요!</p>
 
             <h3>📌 응모 방법</h3>
-            <p>1️⃣ <strong>제품 선택: </strong> 응모할 저탄소 제품을 선택하세요.</p>
-            <p>2️⃣ <strong>영수증 업로드: </strong> 파일 선택 후 영수증을 업로드하세요.</p>
-            <p>3️⃣ <strong>응모하기 버튼 클릭: </strong> 정상 등록되면 스탬프가 적립됩니다.</p>
+            <p>1️⃣ 저탄소 마크 이미지와 영수증을 각각 업로드</p>
+            <p>2️⃣ 응모하기 클릭 시 인증 성공 시 스탬프 적립</p>
 
             <h3>🎁 이벤트 혜택</h3>
-            <p>✔ 스탬프를 모으면 등급이 상승하고 추가 혜택이 주어집니다.</p>
-            <p>✔ 할인 쿠폰은 ‘내 쿠폰’ 페이지에서 확인할 수 있습니다.</p>
+            <p>✔ 등급이 상승하면 할인 쿠폰 등 혜택이 주어집니다.</p>
           </div>
 
           <form onSubmit={handleSubmit} id="applyForm">
-            <h2 id="receiptLabel">인증</h2>
-            
-            {/* 파일 업로드 */}
-            <input type="file" id="applyFile" accept="image/*" onChange={handleFileChange} />
+            <h2>📤 이미지 업로드</h2>
 
-            {/* 이미지 미리보기 */}
-            {preview && (
-              <div className="image-preview">
-                <img src={preview} alt="영수증 미리보기" style={{ width: "150px", marginTop: "10px" }} />
-              </div>
-            )}
+            <label>저탄소 마크 이미지</label>
+            <input type="file" accept="image/*" onChange={handleMarkChange} />
+            {markPreview && <img src={markPreview} alt="마크 미리보기" width="150" />}
+
+            <br />
+
+            <label>영수증 이미지</label>
+            <input type="file" accept="image/*" onChange={handleReceiptChange} />
+            {receiptPreview && <img src={receiptPreview} alt="영수증 미리보기" width="150" />}
 
             <button type="submit" id="applybtn">응모하기</button>
-
             {feedback && <p className="feedback-message">{feedback}</p>}
           </form>
         </div>
