@@ -1,4 +1,3 @@
-// ✅ CommunityCheck.js - 댓글 수정 textarea 크기 축소
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { UserContext } from '../UserContext';
@@ -173,7 +172,7 @@ const CommunityDetailPage = () => {
             <textarea
               value={editedText}
               onChange={(e) => setEditedText(e.target.value)}
-              style={{ width: '100%', height: '60px' }}
+              style={{ width: '100%', height: '40px' }}
             />
             <div>
               <button onClick={() => handleCommentUpdate(c.id)}>저장</button>

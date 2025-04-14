@@ -8,11 +8,7 @@ const Sidebar = () => {
       <h2>커뮤니티</h2>
       <ul>
         <li>
-          <Link
-            to="/community"
-            id="side_community"
-            style={{ color: '#4CAF50' }}
-          >
+          <Link to="/community" id="side_community" style={{ color: '#4CAF50' }}>
             커뮤니티
           </Link>
         </li>
@@ -103,10 +99,7 @@ const CommunityPage = () => {
                 <tr className="ranking-tr" key={item.id}>
                   <td className="ranking-th">{index + 1}</td>
                   <td className="ranking-th">
-                    <Link
-                      to={`/communityCheck/${item.id}`}
-                      style={{ color: 'black' }}
-                    >
+                    <Link to={`/communityCheck/${item.id}`} style={{ color: 'black' }}>
                       {item.title}
                     </Link>
                   </td>
@@ -137,10 +130,7 @@ const CommunityPage = () => {
                 <tr className="board-tr" key={post.id}>
                   <td className="board-th">{post.id}</td>
                   <td className="board-th">
-                    <Link
-                      to={`/communityCheck/${post.id}`}
-                      style={{ color: 'black' }}
-                    >
+                    <Link to={`/communityCheck/${post.id}`} style={{ color: 'black' }}>
                       {post.title}
                     </Link>
                   </td>
@@ -154,10 +144,7 @@ const CommunityPage = () => {
 
           {/* 페이지 네비게이션 */}
           <div className="community-number">
-            <button
-              className="number"
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
+            <button className="number" onClick={() => handlePageChange(currentPage - 1)}>
               &lt;
             </button>
             {Array.from({ length: totalPages }, (_, i) => (
@@ -172,10 +159,7 @@ const CommunityPage = () => {
                 {i + 1}
               </button>
             ))}
-            <button
-              className="number"
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
+            <button className="number" onClick={() => handlePageChange(currentPage + 1)}>
               &gt;
             </button>
           </div>
