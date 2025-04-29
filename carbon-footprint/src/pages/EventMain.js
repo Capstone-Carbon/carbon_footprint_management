@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import "./../sub_css/Event.css";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import './../sub_css/Event.css';
 
 const Sidebar = () => {
   return (
@@ -8,7 +8,9 @@ const Sidebar = () => {
       <h2>이벤트</h2>
       <ul>
         <li>
-          <Link to="/event" style={{ color: "#4CAF50" }}>이벤트 응모</Link>
+          <Link to="/event" style={{ color: '#4CAF50' }}>
+            이벤트 응모
+          </Link>
         </li>
       </ul>
     </div>
@@ -20,11 +22,11 @@ const EventPage = () => {
   const [receiptImage, setReceiptImage] = useState(null);
   const [markPreview, setMarkPreview] = useState(null);
   const [receiptPreview, setReceiptPreview] = useState(null);
-  const [feedback, setFeedback] = useState("");
+  const [feedback, setFeedback] = useState('');
 
   useEffect(() => {
-    const storedStamps = localStorage.getItem("stampCount");
-    if (!storedStamps) localStorage.setItem("stampCount", "0");
+    const storedStamps = localStorage.getItem('stampCount');
+    if (!storedStamps) localStorage.setItem('stampCount', '0');
   }, []);
 
   const handleMarkChange = (e) => {
@@ -47,39 +49,45 @@ const EventPage = () => {
     e.preventDefault();
 
     if (!markImage || !receiptImage) {
-      setFeedback("⚠️ 마크 이미지와 영수증 이미지를 모두 업로드해주세요.");
+      setFeedback('⚠️ 마크 이미지와 영수증 이미지를 모두 업로드해주세요.');
       return;
     }
 
-    const userId = localStorage.getItem("userId");
+    const userId = localStorage.getItem('userId');
     if (!userId) {
-      setFeedback("⚠️ 로그인 정보가 없습니다. 먼저 로그인 해주세요.");
+      setFeedback('⚠️ 로그인 정보가 없습니다. 먼저 로그인 해주세요.');
       return;
     }
 
     const formData = new FormData();
-    formData.append("user_id", userId);
-    formData.append("mark_img", markImage);      // ✅ 여기를 백엔드와 일치
-    formData.append("receipt_img", receiptImage); // ✅ 여기도 백엔드와 일치
+    formData.append('user_id', userId);
+    formData.append('mark_img', markImage); // ✅ 여기를 백엔드와 일치
+    formData.append('receipt_img', receiptImage); // ✅ 여기도 백엔드와 일치
 
     try {
-      const response = await fetch("http://localhost:8000/verify_receipt?user_id=" + userId, {
-        method: "POST",
-        body: formData
-      });      
+      const response = await fetch(
+        'http://localhost:8001/verify_receipt?user_id=' + userId,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
 
       const result = await response.json();
 
       if (result.valid) {
-        let currentStamp = parseInt(localStorage.getItem("stampCount") || "0", 10);
-        localStorage.setItem("stampCount", (currentStamp + 1).toString());
-        setFeedback("✅ 인증 성공! 스탬프 +1 🎉");
+        let currentStamp = parseInt(
+          localStorage.getItem('stampCount') || '0',
+          10
+        );
+        localStorage.setItem('stampCount', (currentStamp + 1).toString());
+        setFeedback('✅ 인증 성공! 스탬프 +1 🎉');
       } else {
-        setFeedback("❌ 인증 실패. 올바른 마크와 영수증을 업로드해주세요.");
+        setFeedback('❌ 인증 실패. 올바른 마크와 영수증을 업로드해주세요.');
       }
     } catch (error) {
-      console.error("서버 오류:", error);
-      setFeedback("🚨 서버 오류가 발생했습니다.");
+      console.error('서버 오류:', error);
+      setFeedback('🚨 서버 오류가 발생했습니다.');
     }
   };
 
@@ -106,15 +114,25 @@ const EventPage = () => {
 
             <label>저탄소 마크 이미지</label>
             <input type="file" accept="image/*" onChange={handleMarkChange} />
-            {markPreview && <img src={markPreview} alt="마크 미리보기" width="150" />}
+            {markPreview && (
+              <img src={markPreview} alt="마크 미리보기" width="150" />
+            )}
 
             <br />
 
             <label>영수증 이미지</label>
-            <input type="file" accept="image/*" onChange={handleReceiptChange} />
-            {receiptPreview && <img src={receiptPreview} alt="영수증 미리보기" width="150" />}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleReceiptChange}
+            />
+            {receiptPreview && (
+              <img src={receiptPreview} alt="영수증 미리보기" width="150" />
+            )}
 
-            <button type="submit" id="applybtn">응모하기</button>
+            <button type="submit" id="applybtn">
+              응모하기
+            </button>
             {feedback && <p className="feedback-message">{feedback}</p>}
           </form>
         </div>

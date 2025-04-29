@@ -1,10 +1,8 @@
-# ✅ FastAPI main.py (탄소 저장 + OCR 인증 기능 + DB 저장 통합 최종 버전)
+# ✅ FastAPI main.py (OCR 인증 전용)
 from fastapi import FastAPI, HTTPException, Query, Request, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
-import pickle
-import numpy as np
 import sqlite3
 import os
 import logging
@@ -15,7 +13,8 @@ import re
 from pyzbar.pyzbar import decode
 from PIL import Image as PILImage
 import pytesseract
-from datetime import datetime, date
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+from datetime import datetime
 
 app = FastAPI()
 
@@ -30,15 +29,6 @@ app.add_middleware(
 
 # ✅ 로깅 설정
 logging.basicConfig(level=logging.DEBUG)
-
-# ✅ 모델 로드
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "carbon_model.pkl")
-try:
-    with open(MODEL_PATH, "rb") as file:
-        model = pickle.load(file)
-    print("✅ 모델 로드 성공!")
-except Exception as e:
-    print(f"❌ 모델 로드 실패: {e}")
 
 # ✅ SQLite 연결
 DB_PATH = "./user_datas.db"
@@ -62,14 +52,6 @@ def initialize_db():
         )
     """)
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS daily_emissions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id TEXT,
-            emission REAL,
-            date TEXT
-        )
-    """)
-    cur.execute("""
         CREATE TABLE IF NOT EXISTS certifications (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id TEXT,
@@ -83,23 +65,13 @@ def initialize_db():
 
 initialize_db()
 
-# ✅ 데이터 모델
-class CarbonFootprintRequest(BaseModel):
-    car: float
-    bus: float
-    walk: float
-
+# ✅ 위치 저장 API
 class LocationData(BaseModel):
     user_id: str
     latitude: float
     longitude: float
     speed: float
 
-class DailyEmission(BaseModel):
-    user_id: str
-    emission: float
-
-# ✅ 위치 저장 API
 @app.post("/location")
 def receive_location(loc: LocationData):
     conn = get_db()
@@ -113,51 +85,7 @@ def receive_location(loc: LocationData):
     print(f"✅ 위치 저장 | 사용자: {loc.user_id}, 속도: {loc.speed:.2f} km/h")
     return {"message": "위치 및 속도 저장 완료!"}
 
-# ✅ 예측 API
-@app.get("/predict")
-async def predict(
-    car: float = Query(...),
-    bus: float = Query(...),
-    walk: float = Query(...)
-):
-    try:
-        input_data = np.array([[car, bus, walk]], dtype=float)
-        prediction = float(model.predict(input_data)[0])
-        return {"predicted_emission": round(prediction, 2)}
-    except Exception as e:
-        logging.error(f"❌ 예측 오류: {e}")
-        raise HTTPException(status_code=500, detail="서버 오류")
-
-# ✅ 추천 API
-emission_factors = {"car": 180, "bus": 80, "walk": 0}
-
-@app.get("/recommend")
-async def recommend(car: float = 0, bus: float = 0, walk: float = 0):
-    result = []
-    if car > 10:
-        result.append("🚗 자동차를 10km 줄이면 1800g CO₂ 절감!")
-    if bus < 20:
-        result.append("🚌 버스를 10km 늘리면 800g CO₂ 절감!")
-    if car > 3 and walk < 5:
-        result.append("🚶 도보 이동을 늘리면 탄소 배출 없이 건강도 챙겨요!")
-    return {"recommendations": result}
-
-# ✅ 하루 탄소 저장 및 위치 삭제
-@app.post("/save_daily_emission")
-def save_emission(data: DailyEmission):
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("""
-        INSERT INTO daily_emissions (user_id, emission, date)
-        VALUES (?, ?, ?)
-    """, (data.user_id, data.emission, str(date.today())))
-    cur.execute("DELETE FROM locations WHERE user_id = ?", (data.user_id,))
-    conn.commit()
-    conn.close()
-    return {"message": "✅ 탄소 저장 및 위치 삭제 완료!"}
-
-
-# ✅ OCR 바코드 추출 함수 (with 전처리)
+# ✅ OCR 바코드 추출 및 마크 검증 함수
 BARCODE_REGEX = r"\b[0-9]{13}\b"
 TEMPLATE_MARK_PATH = os.path.join(os.path.dirname(__file__), "template_mark.png")
 
@@ -205,9 +133,7 @@ def extract_barcodes_all_methods(image_path, preprocess=False):
 
 def is_similar_barcode(target, candidates):
     for code in candidates:
-        if target == code:
-            return True
-        if target in code or code in target:
+        if target == code or target in code or code in target:
             return True
     return False
 
@@ -216,13 +142,13 @@ def check_mark_template(image_path, threshold=0.2):
         img = cv2.imread(image_path, 0)
         template = cv2.imread(TEMPLATE_MARK_PATH, 0)
         res = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)
-        min_val, max_val, _, _ = cv2.minMaxLoc(res)
+        _, max_val, _, _ = cv2.minMaxLoc(res)
         print(f"📐 마크 템플릿 유사도 점수: {max_val}")
         return max_val >= threshold
     except Exception as e:
         print(f"❌ 템플릿 비교 실패: {e}")
         return False
-    
+
 @app.post("/verify_receipt")
 async def verify_receipt(
     user_id: str = Query(...),
@@ -243,7 +169,6 @@ async def verify_receipt(
 
         barcode1 = barcode1_list[0] if barcode1_list else None
         matched = is_similar_barcode(barcode1, barcode2_list) if barcode1 else False
-
         mark_valid = check_mark_template(mark_path)
 
         print("📦 마크 바코드:", barcode1)
@@ -254,12 +179,10 @@ async def verify_receipt(
         conn = get_db()
         cur = conn.cursor()
         cur.execute("""
-            INSERT INTO certifications (user_id, barcode1, barcode2, matched, mark_valid)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO certifications (user_id, product_matched, mark_matched)
+            VALUES (?, ?, ?)
         """, (
             user_id,
-            barcode1,
-            ','.join(barcode2_list),
             matched,
             mark_valid
         ))
@@ -281,9 +204,14 @@ async def verify_receipt(
         logging.error(f"❌ 인증 실패: {e}")
         return JSONResponse(status_code=500, content={"error": "OCR 처리 실패", "detail": str(e)})
 
-
 # ✅ 글로벌 예외
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logging.error(f"🔥 글로벌 예외 발생: {exc}")
     return HTTPException(status_code=500, detail="🚨 서버 오류")
+
+
+
+
+
+##  uvicorn main:app --reload --host 0.0.0.0 --port 8001
