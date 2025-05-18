@@ -52,12 +52,12 @@ MODEL_PATH_PKL = os.path.join("data", "carbon_model.pkl")
 MODEL_PATH_KERAS = os.path.join("data", "best_carbon_model.keras")
 
 def load_model():
-    if os.path.exists(MODEL_PATH_PKL):
-        print("✅ 랜덤 포레스트 모델 로드 중...")
-        with open(MODEL_PATH_PKL, "rb") as file:
-            return pickle.load(file), "Random Forest"
+    # if os.path.exists(MODEL_PATH_PKL):
+    #     print("✅ 랜덤 포레스트 모델 로드 중...")
+    #     with open(MODEL_PATH_PKL, "rb") as file:
+    #         return pickle.load(file), "Random Forest"
 
-    elif os.path.exists(MODEL_PATH_KERAS):
+    if os.path.exists(MODEL_PATH_KERAS):
         print("✅ 신경망(MLP) 모델 로드 중...")
         return tf.keras.models.load_model(MODEL_PATH_KERAS, compile=False), "Neural Network (MLP)"
 

@@ -40,17 +40,22 @@ const CarbonPieChart = () => {
       const userId = localStorage.getItem('userId');
       if (!userId) return;
 
+      // Call the transport summary API from main.py
       const response = await fetch(
-        `http://127.0.0.1:8000/user_data?user_id=${userId}`
+        `http://127.0.0.1:8001/transport_summary/${userId}`
       );
       if (!response.ok) throw new Error(`상태 코드: ${response.status}`);
 
       const data = await response.json();
+      
+      // Update state with the data from the transport summary API
       setDistances({
         car_distance: data.car_distance || 0,
         bus_distance: data.bus_distance || 0,
-        walk_distance: data.walk_distance || 0,
+        walk_distance: data.walking_distance || 0, // Note: API returns 'walking_distance' not 'walk_distance'
       });
+      
+      console.log('✅ 사용자 이동거리 데이터 로드 완료:', data);
     } catch (error) {
       console.error('❌ 사용자 데이터 가져오기 실패:', error.message);
     }

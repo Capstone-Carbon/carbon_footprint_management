@@ -60,6 +60,17 @@ def initialize_db():
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS daily_transport (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT,
+            date TEXT,
+            walking_distance REAL DEFAULT 0,
+            bus_distance REAL DEFAULT 0,
+            car_distance REAL DEFAULT 0,
+            UNIQUE(user_id, date)
+        )
+    """)
     conn.commit()
     conn.close()
 
@@ -204,14 +215,121 @@ async def verify_receipt(
         logging.error(f"❌ 인증 실패: {e}")
         return JSONResponse(status_code=500, content={"error": "OCR 처리 실패", "detail": str(e)})
 
+# ✅ 일일 교통수단 거리 저장 API
+class TransportData(BaseModel):
+    user_id: str
+    walking_distance: float = 0
+    bus_distance: float = 0
+    car_distance: float = 0
+    
+@app.post("/transport_summary")
+def save_transport_summary(data: TransportData):
+    today = datetime.now().strftime("%Y-%m-%d")
+    conn = get_db()
+    cur = conn.cursor()
+    
+    try:
+        # 먼저 해당 날짜의 기존 데이터가 있는지 확인
+        cur.execute("""
+            SELECT walking_distance, bus_distance, car_distance 
+            FROM daily_transport 
+            WHERE user_id = ? AND date = ?
+        """, (data.user_id, today))
+        
+        result = cur.fetchone()
+        
+        if result:
+            # 기존 데이터가 있으면 합산하여 업데이트
+            walking_sum = result['walking_distance'] + data.walking_distance
+            bus_sum = result['bus_distance'] + data.bus_distance
+            car_sum = result['car_distance'] + data.car_distance
+            
+            cur.execute("""
+                UPDATE daily_transport 
+                SET walking_distance = ?, bus_distance = ?, car_distance = ? 
+                WHERE user_id = ? AND date = ?
+            """, (walking_sum, bus_sum, car_sum, data.user_id, today))
+            
+            message = "교통수단 거리 업데이트 완료"
+        else:
+            # 기존 데이터가 없으면 새로 삽입
+            cur.execute("""
+                INSERT INTO daily_transport (user_id, date, walking_distance, bus_distance, car_distance)
+                VALUES (?, ?, ?, ?, ?)
+            """, (data.user_id, today, data.walking_distance, data.bus_distance, data.car_distance))
+            
+            message = "교통수단 거리 신규 저장 완료"
+        
+        conn.commit()
+        print(f"✅ {message} | 사용자: {data.user_id}, 날짜: {today}")
+        
+        # 합산된 최종 데이터를 응답으로 반환
+        cur.execute("""
+            SELECT walking_distance, bus_distance, car_distance 
+            FROM daily_transport 
+            WHERE user_id = ? AND date = ?
+        """, (data.user_id, today))
+        final_data = cur.fetchone()
+        
+        return {
+            "message": message,
+            "date": today,
+            "walking_distance": final_data['walking_distance'],
+            "bus_distance": final_data['bus_distance'],
+            "car_distance": final_data['car_distance']
+        }
+        
+    except Exception as e:
+        conn.rollback()
+        print(f"❌ 교통수단 거리 저장 오류: {e}")
+        raise HTTPException(status_code=500, detail=f"데이터 저장 중 오류 발생: {str(e)}")
+    finally:
+        conn.close()
+
+@app.get("/transport_summary/{user_id}")
+def get_transport_summary(user_id: str, date: str = None):
+    conn = get_db()
+    cur = conn.cursor()
+    
+    try:
+        # 날짜가 지정되지 않으면 오늘 날짜 사용
+        if not date:
+            date = datetime.now().strftime("%Y-%m-%d")
+        
+        cur.execute("""
+            SELECT date, walking_distance, bus_distance, car_distance 
+            FROM daily_transport 
+            WHERE user_id = ? AND date = ?
+        """, (user_id, date))
+        
+        result = cur.fetchone()
+        
+        if result:
+            return {
+                "date": result['date'],
+                "walking_distance": result['walking_distance'],
+                "bus_distance": result['bus_distance'],
+                "car_distance": result['car_distance']
+            }
+        else:
+            return {
+                "date": date,
+                "walking_distance": 0,
+                "bus_distance": 0,
+                "car_distance": 0,
+                "message": "해당 날짜의 데이터가 없습니다."
+            }
+    
+    except Exception as e:
+        print(f"❌ 교통수단 거리 조회 오류: {e}")
+        raise HTTPException(status_code=500, detail=f"데이터 조회 중 오류 발생: {str(e)}")
+    finally:
+        conn.close()
+
 # ✅ 글로벌 예외
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logging.error(f"🔥 글로벌 예외 발생: {exc}")
     return HTTPException(status_code=500, detail="🚨 서버 오류")
-
-
-
-
 
 ##  uvicorn main:app --reload --host 0.0.0.0 --port 8001
