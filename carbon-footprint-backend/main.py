@@ -325,12 +325,27 @@ def get_transport_summary(user_id: str, date: str = None):
         raise HTTPException(status_code=500, detail=f"데이터 조회 중 오류 발생: {str(e)}")
     finally:
         conn.close()
+        
+from fastapi import Query
+
+@app.get("/certifications/count")
+def get_certification_count(user_id: str = Query(...)):
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT COUNT(*) FROM certifications WHERE user_id = ? AND product_matched = 1 AND mark_matched = 1",
+        (user_id,),
+    )
+    count = cur.fetchone()[0]
+    conn.close()
+    return {"count": count}
+
 
 # ✅ 글로벌 예외
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logging.error(f"🔥 글로벌 예외 발생: {exc}")
-    return HTTPException(status_code=500, detail="🚨 서버 오류")
+    raise HTTPException(status_code=500, detail="🚨 서버 오류")
 
 
 

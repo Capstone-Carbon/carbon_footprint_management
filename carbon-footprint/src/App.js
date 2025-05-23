@@ -218,16 +218,25 @@ function App() {
                               );
                             })
                           ) : (
-                            <p
+                            <div
                               style={{
-                                textAlign: 'center',
-                                padding: '30px 0',
-                                fontSize: '15px',
-                                color: '#999',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                height: '200px',
+                                width: '100%',
                               }}
                             >
-                              🚫 최근 5일치 이동 데이터를 불러올 수 없습니다.
-                            </p>
+                              <p
+                                style={{
+                                  fontSize: '16px',
+                                  color: '#999',
+                                  margin: 0,
+                                }}
+                              >
+                                🚫 최근 5일치 이동 데이터를 불러올 수 없습니다.
+                              </p>
+                            </div>
                           )}
                         </div>
                       </div>
@@ -297,7 +306,11 @@ function App() {
                           <span className="notice_plus">+</span>
                           <div className="clear"></div>
                           <hr style={{ width: '100%' }} />
-                          <p>홈페이지 점검시간: 2024 - 11 - 20</p>
+                          <p>
+                            홈페이지 점검시간: {new Date().getFullYear()} -{' '}
+                            {String(new Date().getMonth() + 1).padStart(2, '0')}{' '}
+                            - {String(new Date().getDate()).padStart(2, '0')}
+                          </p>
                         </div>
                       </div>
                     </div>

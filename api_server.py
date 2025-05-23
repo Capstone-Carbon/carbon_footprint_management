@@ -1,11 +1,18 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 import os
+os.environ.pop("SSL_CERT_FILE", None)
 import pickle
 import tensorflow as tf
 import numpy as np
 import sqlite3
+from openai import OpenAI
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+
+# ✅ 환경 변수 로드 및 GPT 키 설정
+load_dotenv()
+client = OpenAI()
 
 app = FastAPI()
 
@@ -46,6 +53,23 @@ def initialize_database():
 
 # ✅ 서버 시작 시 DB 초기화
 initialize_database()
+
+# ✅ GPT 챗봇 API
+@app.post("/chatbot_gpt")
+async def chatbot_gpt(request: Request):
+    body = await request.json()
+    query = body.get("query", "")
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": query}],
+        )
+        reply = response.choices[0].message.content
+        return {"reply": reply}
+    except Exception as e:
+        return {"reply": f"❌ 오류가 발생했습니다: {str(e)}"}
+
 
 # ✅ AI 모델 로드
 MODEL_PATH_PKL = os.path.join("data", "carbon_model.pkl")

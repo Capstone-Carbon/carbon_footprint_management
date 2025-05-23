@@ -16,7 +16,7 @@ const Sidebar = () => {
           </Link>
         </li>
         <li>
-          <Link to="/company">기업 탄소 배출량</Link>
+          <Link to="/company">탄소 챗봇</Link>
         </li>
       </ul>
     </div>
@@ -40,22 +40,24 @@ const CarbonPieChart = () => {
       const userId = localStorage.getItem('userId');
       if (!userId) return;
 
-      // Call the transport summary API from main.py
       const response = await fetch(
-        `http://127.0.0.1:8001/transport_summary/${userId}`
+        `http://127.0.0.1:8000/transport_history/${userId}`
       );
       if (!response.ok) throw new Error(`상태 코드: ${response.status}`);
 
       const data = await response.json();
-      
-      // Update state with the data from the transport summary API
-      setDistances({
-        car_distance: data.car_distance || 0,
-        bus_distance: data.bus_distance || 0,
-        walk_distance: data.walking_distance || 0, // Note: API returns 'walking_distance' not 'walk_distance'
-      });
-      
-      console.log('✅ 사용자 이동거리 데이터 로드 완료:', data);
+
+      if (data.length > 0) {
+        const latest = data[data.length - 1];
+        setDistances({
+          car_distance: latest.car || 0,
+          bus_distance: latest.bus || 0,
+          walk_distance: latest.walk || 0,
+        });
+        console.log('✅ 오늘 이동 거리 데이터 로드:', latest);
+      } else {
+        console.warn('🚫 이동 거리 데이터가 없습니다.');
+      }
     } catch (error) {
       console.error('❌ 사용자 데이터 가져오기 실패:', error.message);
     }

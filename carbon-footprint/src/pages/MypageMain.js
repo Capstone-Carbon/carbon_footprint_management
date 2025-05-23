@@ -18,41 +18,49 @@ const Sidebar = () => {
 };
 
 const MyPage = () => {
-  const maxStamps = 10;
+  const maxStamps = 30;
+  const [totalStampCount, setTotalStampCount] = useState(0);
+  const [visualStampCount, setVisualStampCount] = useState(0);
+  const [level, setLevel] = useState('BRONZE');
+  const [accountInputVisible, setAccountInputVisible] = useState(false);
+  const [bankAccount, setBankAccount] = useState('');
 
-  const getStoredValue = (key, defaultValue) => {
+  const fetchStampCount = async () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
     try {
-      const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : defaultValue;
-    } catch (e) {
-      return localStorage.getItem(key) || defaultValue;
+      const response = await fetch(
+        `http://localhost:8001/certifications/count?user_id=${userId}`
+      );
+      const data = await response.json();
+
+      setTotalStampCount(data.count);
+      setVisualStampCount(data.count % 30);
+
+      const cycle = Math.floor(data.count / 30);
+      if (cycle >= 3) {
+        setLevel('GOLD');
+      } else if (cycle >= 2) {
+        setLevel('SILVER');
+      } else {
+        setLevel('BRONZE');
+      }
+    } catch (error) {
+      console.error('스탬프 개수 가져오기 실패:', error);
     }
   };
 
-  const [stampCount, setStampCount] = useState(getStoredValue('stampCount', 0));
-  const [progress, setProgress] = useState(0);
-  const [level, setLevel] = useState('BRONZE');
-
-  // 🔁 stampCount 바뀔 때 등급/진행률 자동 계산
   useEffect(() => {
-    const percentage = Math.min((stampCount / maxStamps) * 100, 100);
-    setProgress(Math.round(percentage));
+    fetchStampCount();
+  }, []);
 
-    if (stampCount >= 8) {
-      setLevel('GOLD');
-    } else if (stampCount >= 5) {
-      setLevel('SILVER');
-    } else {
-      setLevel('BRONZE');
-    }
-  }, [stampCount]);
+  const handleSubmitAccount = () => {
+    alert('계좌 정보가 저장되었습니다.');
+    fetchStampCount(); // 등급과 스탬프 갱신
+  };
 
-  // 🔒 저장
-  useEffect(() => {
-    localStorage.setItem('stampCount', JSON.stringify(stampCount));
-    localStorage.setItem('progress', JSON.stringify(progress));
-    localStorage.setItem('level', JSON.stringify(level));
-  }, [stampCount, progress, level]);
+  const progress = Math.round((visualStampCount / maxStamps) * 100);
 
   return (
     <div className="container">
@@ -60,7 +68,9 @@ const MyPage = () => {
       <div className="main-content">
         <h2>마이 등급</h2>
         <div className="level-section">
-          <p>현재 등급: <strong>{level}</strong></p>
+          <p>
+            현재 등급: <strong>{level}</strong>
+          </p>
           <div className="progress-container">
             <div className="progress-bar">
               <div className="progress" style={{ width: `${progress}%` }}></div>
@@ -75,25 +85,37 @@ const MyPage = () => {
             {Array.from({ length: maxStamps }).map((_, index) => (
               <div
                 key={index}
-                className={`stamp ${index < stampCount ? 'filled' : ''}`}
+                className={`stamp ${index < visualStampCount ? 'filled' : ''}`}
               >
                 {index + 1}
               </div>
             ))}
           </div>
-        </div>
 
-        <h2>내 쿠폰</h2>
-        <div className="coupon-section">
-          <p>현재 등급에 따른 쿠폰</p>
-          {level === 'BRONZE' && (
-            <p>브론즈 등급 1000원 할인 쿠폰 (유효기간: 2025.01.31)</p>
-          )}
-          {level === 'SILVER' && (
-            <p>실버 등급 3000원 할인 쿠폰 (유효기간: 2025.01.31)</p>
-          )}
-          {level === 'GOLD' && (
-            <p>골드 등급 5000원 할인 쿠폰 (유효기간: 2025.01.31)</p>
+          {/* 30개 채웠을 때만 보상 메시지 */}
+          {totalStampCount > 0 && totalStampCount % 30 === 0 && (
+            <div className="reward-message">
+              <p style={{ color: 'green' }}>
+                🎉 스탬프 30개를 모두 채우셨습니다!
+              </p>
+              <p>관리자에게 현금 1,000원이 지급될 예정입니다.</p>
+
+              {!accountInputVisible ? (
+                <button onClick={() => setAccountInputVisible(true)}>
+                  계좌 정보 입력
+                </button>
+              ) : (
+                <div>
+                  <input
+                    type="text"
+                    placeholder="예: 국민은행 123456-78-901234"
+                    value={bankAccount}
+                    onChange={(e) => setBankAccount(e.target.value)}
+                  />
+                  <button onClick={handleSubmitAccount}>저장</button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
