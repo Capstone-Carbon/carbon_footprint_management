@@ -75,6 +75,49 @@ const Sidebar = () => {
 };
 
 function App() {
+  const [graphData, setGraphData] = useState([]);
+
+  const fetchGraphData = async () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/transport_history/${userId}`
+      );
+      if (!response.ok) throw new Error('그래프 데이터 로드 실패');
+
+      const data = await response.json();
+      setGraphData(data);
+    } catch (error) {
+      console.error('❌ 그래프 로딩 실패:', error);
+    }
+  };
+
+  const [trendResult, setTrendResult] = useState(null);
+
+  const fetchTrendPrediction = async () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:8000/predict_trend/${userId}`
+      );
+      if (!response.ok) throw new Error('예측 요청 실패');
+
+      const data = await response.json();
+      setTrendResult(data);
+    } catch (error) {
+      console.error('❌ 예측 실패:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTrendPrediction();
+    fetchGraphData();
+  }, []);
+
   const [stampCount, setStampCount] = useState(3); // 스탬프 개수 관리
 
   return (
@@ -143,31 +186,73 @@ function App() {
                       <div className="my-carbon">
                         <h2>나의 탄소 발자국</h2>
                         <div className="mainpage_chart">
-                          <div className="bar" style={{ height: '40%' }}>
-                            12/01
-                          </div>
-                          <div className="bar" style={{ height: '50%' }}>
-                            12/02
-                          </div>
-                          <div className="bar" style={{ height: '30%' }}>
-                            12/03
-                          </div>
-                          <div className="bar" style={{ height: '20%' }}>
-                            12/04
-                          </div>
-                          <div className="bar active" style={{ height: '70%' }}>
-                            12/05
-                          </div>
+                          {graphData.length > 0 ? (
+                            graphData.map((entry, index) => {
+                              const total =
+                                Number(entry.car || 0) +
+                                Number(entry.bus || 0) +
+                                Number(entry.walk || 0);
+                              const max = Math.max(
+                                ...graphData.map(
+                                  (e) =>
+                                    Number(e.car || 0) +
+                                    Number(e.bus || 0) +
+                                    Number(e.walk || 0)
+                                )
+                              );
+                              const height =
+                                max > 0 ? Math.round((total / max) * 100) : 0;
+
+                              return (
+                                <div
+                                  key={index}
+                                  className={`bar ${
+                                    index === graphData.length - 1
+                                      ? 'active'
+                                      : ''
+                                  }`}
+                                  style={{ height: `${height}%` }}
+                                >
+                                  {entry.date.slice(5)}
+                                </div>
+                              );
+                            })
+                          ) : (
+                            <p
+                              style={{
+                                textAlign: 'center',
+                                padding: '30px 0',
+                                fontSize: '15px',
+                                color: '#999',
+                              }}
+                            >
+                              🚫 최근 5일치 이동 데이터를 불러올 수 없습니다.
+                            </p>
+                          )}
                         </div>
                       </div>
-
                       <div className="goal-section">
                         <p>
-                          한 달 내로 탄소 배출량을 10% 줄일 수 있을 것으로
-                          예측됩니다.
+                          {trendResult
+                            ? (() => {
+                                const today = trendResult.today_emission_g;
+                                const tomorrow =
+                                  trendResult.tomorrow_prediction
+                                    .predicted_emission_g;
+                                const rate = ((tomorrow - today) / today) * 100;
+                                const absRate = Math.abs(rate).toFixed(1);
+                                if (rate > 0) {
+                                  return `현재 이동 패턴을 유지하면 탄소 배출량이 약 ${absRate}% 늘어날 것으로 예측됩니다.`;
+                                } else if (rate < 0) {
+                                  return `현재 이동 패턴을 유지하면 탄소 배출량이 약 ${absRate}% 줄어들 것으로 예측됩니다.`;
+                                } else {
+                                  return `현재 이동 패턴을 유지하면 탄소 배출량은 큰 변화 없이 유지될 것으로 예측됩니다.`;
+                                }
+                              })()
+                            : '5일간 탄소 배출량 예측 결과를 불러오는 중입니다...'}
                         </p>
                         <Link to="/personal" className="sideMenu">
-                          <button> 목표 설정</button>
+                          <button> 오늘의 탄소 발자국 분석 </button>
                         </Link>
                       </div>
                     </section>

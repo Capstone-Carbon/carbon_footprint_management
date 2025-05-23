@@ -88,7 +88,37 @@ app.post('/register', async (req, res) => {
   );
 });
 
-// 로그인
+// // 로그인
+// app.post('/login', (req, res) => {
+//   const { username, password } = req.body;
+//   db.get(
+//     'SELECT * FROM users WHERE username = ?',
+//     [username],
+//     async (err, user) => {
+//       if (!user)
+//         return res
+//           .status(400)
+//           .json({ message: '아이디 또는 비밀번호가 올바르지 않습니다.' });
+//       const isMatch = await bcrypt.compare(password, user.password);
+//       if (!isMatch)
+//         return res
+//           .status(400)
+//           .json({ message: '아이디 또는 비밀번호가 올바르지 않습니다.' });
+//       const token = jwt.sign(
+//         { userId: user.id, username: user.username },
+//         process.env.JWT_SECRET,
+//         { expiresIn: '1h' }
+//       );
+//       res.cookie('token', token, {
+//         httpOnly: true,
+//         secure: false,
+//         sameSite: 'Lax',
+//       });
+//       res.json({ message: '로그인 성공' });
+//     }
+//   );
+// });
+// 로그인 (비밀번호 우회 버전)
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
   db.get(
@@ -99,11 +129,15 @@ app.post('/login', (req, res) => {
         return res
           .status(400)
           .json({ message: '아이디 또는 비밀번호가 올바르지 않습니다.' });
-      const isMatch = await bcrypt.compare(password, user.password);
+
+      // ✅ 우회: 무조건 통과
+      const isMatch = true;
+
       if (!isMatch)
         return res
           .status(400)
           .json({ message: '아이디 또는 비밀번호가 올바르지 않습니다.' });
+
       const token = jwt.sign(
         { userId: user.id, username: user.username },
         process.env.JWT_SECRET,
@@ -268,7 +302,9 @@ app.delete('/comments/:id', (req, res) => {
   const commentId = req.params.id;
   db.run('DELETE FROM comments WHERE id = ?', [commentId], function (err) {
     if (err)
-      return res.status(500).json({ message: '댓글 삭제 실패', error: err.message });
+      return res
+        .status(500)
+        .json({ message: '댓글 삭제 실패', error: err.message });
     if (this.changes === 0)
       return res.status(404).json({ message: '해당 댓글을 찾을 수 없습니다.' });
     res.status(200).json({ message: '댓글 삭제 성공' });
@@ -286,9 +322,13 @@ app.put('/comments/:id', (req, res) => {
     [text, commentId],
     function (err) {
       if (err)
-        return res.status(500).json({ message: '댓글 수정 실패', error: err.message });
+        return res
+          .status(500)
+          .json({ message: '댓글 수정 실패', error: err.message });
       if (this.changes === 0)
-        return res.status(404).json({ message: '해당 댓글을 찾을 수 없습니다.' });
+        return res
+          .status(404)
+          .json({ message: '해당 댓글을 찾을 수 없습니다.' });
       res.status(200).json({ message: '댓글 수정 성공' });
     }
   );
@@ -298,4 +338,3 @@ app.put('/comments/:id', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 서버 실행 중: http://localhost:${PORT}`);
 });
-

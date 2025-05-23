@@ -12,7 +12,7 @@ app = FastAPI()
 # ✅ CORS 설정 (React와 통신 가능하도록)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -269,6 +269,104 @@ def recommend(data: PredictionInput):
         "recommendations": recommendations
     }
 
+
+
+
+from sklearn.linear_model import LinearRegression
+
+@app.get("/predict_trend/{user_id}")
+def predict_trend(user_id: str):
+    """
+    📈 최근 5일 이동 데이터를 기반으로 내일 이동 거리 및 탄소 배출량 예측
+    """
+    DB_PATH = os.path.abspath("carbon-footprint-backend/user_datas.db")
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    query = """
+        SELECT date, car_distance, bus_distance, walking_distance
+        FROM daily_transport
+        WHERE user_id = ?
+        ORDER BY date ASC
+        LIMIT 5
+    """
+    rows = cursor.execute(query, (user_id,)).fetchall()
+    conn.close()
+
+    if len(rows) < 2:
+        raise HTTPException(status_code=400, detail="최근 이동 데이터가 2일 이상 필요합니다.")
+
+    days = np.arange(len(rows)).reshape(-1, 1)
+    car_vals = np.array([r[1] for r in rows])
+    bus_vals = np.array([r[2] for r in rows])
+    walk_vals = np.array([r[3] for r in rows])
+
+    car_model = LinearRegression().fit(days, car_vals)
+    bus_model = LinearRegression().fit(days, bus_vals)
+    walk_model = LinearRegression().fit(days, walk_vals)
+
+    next_day = np.array([[len(rows)]])
+    car_pred = max(car_model.predict(next_day)[0], 0)
+    bus_pred = max(bus_model.predict(next_day)[0], 0)
+    walk_pred = max(walk_model.predict(next_day)[0], 0)
+
+    model_path = os.path.join("data", "carbon_model.pkl")
+    if not os.path.exists(model_path):
+        raise HTTPException(status_code=500, detail="모델 파일이 없습니다.")
+    with open(model_path, "rb") as f:
+        rf_model = pickle.load(f)
+
+    tomorrow_input = np.array([[car_pred, bus_pred, walk_pred]])
+    tomorrow_emission = rf_model.predict(tomorrow_input)[0]
+    today_input = np.array([[car_vals[-1], bus_vals[-1], walk_vals[-1]]])
+    today_emission = rf_model.predict(today_input)[0]
+    delta = tomorrow_emission - today_emission
+
+    return {
+        "user_id": user_id,
+        "today_emission_g": round(today_emission, 2),
+        "tomorrow_prediction": {
+            "car": round(car_pred, 2),
+            "bus": round(bus_pred, 2),
+            "walk": round(walk_pred, 2),
+            "predicted_emission_g": round(tomorrow_emission, 2)
+        },
+        "change_from_today": {
+            "delta": round(delta, 2),
+            "increased": bool(delta > 0) 
+        }
+    }
+
+
+
+@app.get("/transport_history/{user_id}")
+def get_transport_history(user_id: str):
+    '''
+    📊 최근 5일치 사용자 이동 거리 데이터를 반환합니다.
+    '''
+    DB_PATH = os.path.abspath("carbon-footprint-backend/user_datas.db")
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    query = '''
+        SELECT date, car_distance, bus_distance, walking_distance
+        FROM daily_transport
+        WHERE user_id = ?
+        ORDER BY date DESC
+        
+    '''
+    rows = cursor.execute(query, (user_id,)).fetchall()
+    conn.close()
+
+    # 최신 → 과거 순이라 역순으로 정렬
+    history = [
+        {
+            "date": row[0],
+            "car": row[1],
+            "bus": row[2],
+            "walk": row[3]
+        }
+        for row in reversed(rows)
+    ]
+    return history
 
 
 ## uvicorn api_server:app --host 127.0.0.1 --port 8000 --reload

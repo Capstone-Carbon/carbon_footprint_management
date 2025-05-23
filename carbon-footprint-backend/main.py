@@ -332,4 +332,7 @@ async def global_exception_handler(request: Request, exc: Exception):
     logging.error(f"🔥 글로벌 예외 발생: {exc}")
     return HTTPException(status_code=500, detail="🚨 서버 오류")
 
+
+
+
 ##  uvicorn main:app --reload --host 0.0.0.0 --port 8001
