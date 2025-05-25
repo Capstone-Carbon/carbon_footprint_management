@@ -19,11 +19,11 @@ const Sidebar = () => {
 
 const CommunityPage = () => {
   const navigate = useNavigate();
-
   const [posts, setPosts] = useState([]);
   const [rankings, setRankings] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 5;
+  const userId = localStorage.getItem('userId'); // ✅ 로그인 여부 확인
 
   const totalPages = Math.ceil(posts.length / postsPerPage);
   const currentPosts = posts.slice(
@@ -32,6 +32,8 @@ const CommunityPage = () => {
   );
 
   useEffect(() => {
+    if (!userId) return;
+
     const fetchPosts = async () => {
       try {
         const response = await fetch('http://localhost:5000/posts');
@@ -46,7 +48,6 @@ const CommunityPage = () => {
       try {
         const response = await fetch('http://localhost:5000/posts/top');
         const data = await response.json();
-        console.log('🔥 랭킹 데이터:', data);
         setRankings(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('❌ 랭킹 조회 실패:', error);
@@ -56,7 +57,7 @@ const CommunityPage = () => {
 
     fetchPosts();
     fetchRankings();
-  }, []);
+  }, [userId]);
 
   const handleJoinClick = () => {
     navigate('/CommunityWrite');
@@ -64,9 +65,10 @@ const CommunityPage = () => {
 
   const formatDate = (dateStr) => {
     const d = new Date(dateStr);
-    return `${d.getFullYear()}-${(d.getMonth() + 1)
+    return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d
+      .getDate()
       .toString()
-      .padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+      .padStart(2, '0')}`;
   };
 
   const handlePageChange = (page) => {
@@ -74,6 +76,31 @@ const CommunityPage = () => {
       setCurrentPage(page);
     }
   };
+
+  if (!userId) {
+    return (
+      <div className="footprint_container">
+        <Sidebar />
+        <div className="main-content">
+          <div
+            style={{
+              backgroundColor: '#fffbe6',
+              padding: '1rem',
+              border: '1px solid #ffd700',
+              borderRadius: '8px',
+              color: '#333',
+              textAlign: 'center',
+              marginTop: '2rem',
+            }}
+          >
+            <p style={{ margin: 0, fontSize: '1.1rem' }}>
+              <strong>로그인이 필요합니다.</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="community_container">
@@ -152,9 +179,7 @@ const CommunityPage = () => {
                 key={i + 1}
                 className="number"
                 onClick={() => handlePageChange(i + 1)}
-                style={{
-                  fontWeight: currentPage === i + 1 ? 'bold' : 'normal',
-                }}
+                style={{ fontWeight: currentPage === i + 1 ? 'bold' : 'normal' }}
               >
                 {i + 1}
               </button>
