@@ -18,6 +18,7 @@ import EventPage from './pages/EventMain';
 import MyPage from './pages/MypageMain';
 import footprint from './images/footprint.png';
 import { UserProvider, UserContext } from './UserContext';
+import CarbonScenarioDashboard from './pages/CarbonScenarioDashboard';
 
 // 사이드바 핸들러 함수
 const openNav = () => {
@@ -137,6 +138,7 @@ function App() {
                   <Link to="/personal" className="main_menu">
                     탄소 발자국
                   </Link>
+
                   <div id="community">
                     <Link to="/community" className="main_menu">
                       커뮤니티
@@ -324,6 +326,7 @@ function App() {
 
               <Route path="/personal" element={<PersonalFootprint />} />
               <Route path="/company" element={<CompanyFootprint />} />
+              <Route path="/scenario" element={<CarbonScenarioDashboard />} />
 
               <Route path="/community" element={<Community />} />
               <Route path="/communityWrite" element={<CommunityWrite />} />

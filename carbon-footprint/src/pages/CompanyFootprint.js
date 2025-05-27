@@ -15,6 +15,9 @@ const Sidebar = () => {
             탄소 챗봇
           </Link>
         </li>
+        <li>
+          <Link to="/scenario">탄소 절감 시뮬레이션</Link>
+        </li>
       </ul>
     </div>
   );
