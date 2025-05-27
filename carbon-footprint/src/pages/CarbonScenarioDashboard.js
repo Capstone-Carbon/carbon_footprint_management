@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
-import annotationPlugin from 'chartjs-plugin-annotation';
 import { Chart } from 'chart.js';
+import annotationPlugin from 'chartjs-plugin-annotation';
+import ErrorBoundary from './ErrorBoundary'; // 위 ErrorBoundary 경로에 맞게 수정
 import './../sub_css/CarbonFootprint.css';
 
 Chart.register(annotationPlugin);
@@ -13,7 +14,6 @@ const CarbonScenarioDashboard = () => {
   const [labels, setLabels] = useState([]);
   const [carEmissions, setCarEmissions] = useState([]);
   const [busEmissions, setBusEmissions] = useState([]);
-  const [walkEmissions, setWalkEmissions] = useState([]);
   const [adjustCar, setAdjustCar] = useState(0);
   const [adjustBus, setAdjustBus] = useState(0);
   const [adjustedEmission, setAdjustedEmission] = useState([]);
@@ -25,9 +25,16 @@ const CarbonScenarioDashboard = () => {
     fetch(`http://127.0.0.1:8000/transport_history/${userId}`)
       .then((res) => res.json())
       .then((data) => {
-        const last5 = data.slice(-5);
+        if (!data || data.length < 5) {
+          setLabels([]);
+          setCarEmissions([]);
+          setBusEmissions([]);
+          return;
+        }
 
+        const last5 = data.slice(-5);
         const lastDate = new Date(last5[last5.length - 1].date);
+
         const predictDates = [1, 2, 3].map((offset) => {
           const d = new Date(lastDate);
           d.setDate(lastDate.getDate() + offset);
@@ -73,9 +80,23 @@ const CarbonScenarioDashboard = () => {
     (car, i) =>
       +(
         car * EMISSION_FACTORS.car +
-        busEmissions[i] * EMISSION_FACTORS.bus
+        (busEmissions[i] || 0) * EMISSION_FACTORS.bus
       ).toFixed(2)
   );
+
+  if (labels.length < 5) {
+    return (
+      <div className="footprint_container">
+        <div className="main-content">
+          <h2>탄소 절감 시뮬레이션</h2>
+          <p>데이터가 부족하여 차트를 표시할 수 없습니다.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const predictStart = Math.max(0, labels.length - 3 - 0.5);
+  const predictEnd = Math.max(0, labels.length - 0.5);
 
   const chartData = {
     labels,
@@ -110,106 +131,102 @@ const CarbonScenarioDashboard = () => {
     ],
   };
 
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom' },
+      // annotation 플러그인 아예 사용 안 함 (임시 회피)
+      // annotation: { ... }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'kg CO₂',
+        },
+      },
+    },
+  };
+
   return (
-    <div className="footprint_container">
-      <div className="sidebar">
-        <h2>탄소발자국</h2>
-        <ul>
-          <li>
-            <a href="/personal">개인 탄소 배출량</a>
-          </li>
-          <li>
-            <a href="/company">탄소 챗봇</a>
-          </li>
-          <li>
-            <a href="/scenario" style={{ color: '#4CAF50' }}>
-              탄소 절감 시뮬레이션
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      <div className="main-content">
-        <h2> 탄소 절감 시뮬레이션</h2>
-        <p>최근 5일의 탄소 배출량과 예측 결과를 비교해보세요.</p>
-
-        <div style={{ marginBottom: '1rem' }}>
-          <div style={{ marginBottom: '0.5rem' }}>
-            <label> 자가용 예측 조정 (%): {adjustCar}%</label>
-            <input
-              type="range"
-              min={-100}
-              max={100}
-              step={1}
-              value={adjustCar}
-              onChange={(e) => setAdjustCar(Number(e.target.value))}
-              style={{
-                width: '100%',
-                maxWidth: '500px',
-                accentColor: '#4CAF50',
-              }}
-            />
-          </div>
-          <div style={{ marginBottom: '0.5rem' }}>
-            <label> 대중교통 예측 조정 (%): {adjustBus}%</label>
-            <input
-              type="range"
-              min={-100}
-              max={100}
-              step={1}
-              value={adjustBus}
-              onChange={(e) => setAdjustBus(Number(e.target.value))}
-              style={{
-                width: '100%',
-                maxWidth: '500px',
-                accentColor: '#4CAF50',
-              }}
-            />
-          </div>
+    <ErrorBoundary>
+      <div className="footprint_container">
+        <div className="sidebar">
+          <h2>탄소발자국</h2>
+          <ul>
+            <li>
+              <a href="/personal">개인 탄소 배출량</a>
+            </li>
+            <li>
+              <a href="/company">탄소 챗봇</a>
+            </li>
+            <li>
+              <a href="/scenario" style={{ color: '#4CAF50' }}>
+                탄소 절감 시뮬레이션
+              </a>
+            </li>
+          </ul>
         </div>
 
-        <div style={{ width: '100%', maxWidth: '1000px' }}>
-          <Line
-            data={chartData}
-            options={{
-              responsive: true,
-              plugins: {
-                legend: { position: 'bottom' },
-                annotation: {
-                  annotations: {
-                    predictArea: {
-                      type: 'box',
-                      xMin: labels.length - 3 - 0.5,
-                      xMax: labels.length - 0.5,
-                      backgroundColor: 'rgba(200,200,200,0.1)',
-                      borderWidth: 0,
-                    },
-                  },
-                },
-              },
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  title: {
-                    display: true,
-                    text: 'kg CO₂',
-                  },
-                },
-              },
-            }}
-          />
-        </div>
+        <div className="main-content">
+          <h2>탄소 절감 시뮬레이션</h2>
+          <p>최근 5일의 탄소 배출량과 예측 결과를 비교해보세요.</p>
 
-        <div style={{ marginTop: '1rem' }}>
-          <strong> 예측 변화량:</strong>{' '}
-          {(
-            adjustedEmission.slice(-3).reduce((a, b) => a + b, 0) -
-            rawTotalEmissions.slice(-3).reduce((a, b) => a + b, 0)
-          ).toFixed(2)}{' '}
-          kg CO₂
+          <div style={{ marginBottom: '1rem' }}>
+            <div style={{ marginBottom: '0.5rem' }}>
+              <label>
+                자가용 예측 조정 (%): {adjustCar}
+                <input
+                  type="range"
+                  min={-100}
+                  max={100}
+                  step={1}
+                  value={adjustCar}
+                  onChange={(e) => setAdjustCar(Number(e.target.value))}
+                  style={{
+                    width: '100%',
+                    maxWidth: 500,
+                    accentColor: '#4CAF50',
+                  }}
+                />
+              </label>
+            </div>
+            <div style={{ marginBottom: '0.5rem' }}>
+              <label>
+                대중교통 예측 조정 (%): {adjustBus}
+                <input
+                  type="range"
+                  min={-100}
+                  max={100}
+                  step={1}
+                  value={adjustBus}
+                  onChange={(e) => setAdjustBus(Number(e.target.value))}
+                  style={{
+                    width: '100%',
+                    maxWidth: 500,
+                    accentColor: '#4CAF50',
+                  }}
+                />
+              </label>
+            </div>
+          </div>
+
+          <div style={{ width: '100%', maxWidth: 1000 }}>
+            <Line data={chartData} options={chartOptions} />
+          </div>
+
+          <div style={{ marginTop: 20 }}>
+            <strong>예측 변화량:</strong>{' '}
+            {(
+              adjustedEmission.slice(-3).reduce((a, b) => a + b, 0) -
+              rawTotalEmissions.slice(-3).reduce((a, b) => a + b, 0)
+            ).toFixed(2)}{' '}
+            kg CO₂
+          </div>
         </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 };
 
