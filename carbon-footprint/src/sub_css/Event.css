@@ -1,16 +1,21 @@
-/* 전체 페이지 스타일 */
+/* 1. 컨테이너가 전체 내용에 맞춰 늘어나도록 */
 .container {
-    display: flex;
-    height: 140vh;
-    max-width: 1200px;
-    margin: 0 auto;
+  height: auto;
+  overflow: visible; /* 내부 스크롤 제거 */
 }
 
-  /* 메인 콘텐츠 스타일 */
-  .main-content {
-    flex: 1;
-    border-radius: 10px;
-  }
+/* 2. 전체 페이지가 세로로 자유롭게 확장될 수 있도록 */
+body, html {
+  height: auto;
+  overflow-y: auto;
+}
+
+/* 3. main-content가 고정된 높이를 갖지 않도록 */
+.main-content {
+  height: auto;
+  overflow: visible;
+}
+
   
   .main-content h2 {
     font-size: 24px;

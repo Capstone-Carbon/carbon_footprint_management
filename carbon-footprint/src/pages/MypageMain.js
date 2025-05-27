@@ -24,6 +24,7 @@ const MyPage = () => {
   const [level, setLevel] = useState('BRONZE');
   const [accountInputVisible, setAccountInputVisible] = useState(false);
   const [bankAccount, setBankAccount] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const fetchStampCount = async () => {
     const userId = localStorage.getItem('userId');
@@ -52,7 +53,11 @@ const MyPage = () => {
   };
 
   useEffect(() => {
-    fetchStampCount();
+    const userId = localStorage.getItem('userId');
+    setIsLoggedIn(!!userId);
+    if (userId) {
+      fetchStampCount();
+    }
   }, []);
 
   const handleSubmitAccount = () => {
@@ -61,6 +66,31 @@ const MyPage = () => {
   };
 
   const progress = Math.round((visualStampCount / maxStamps) * 100);
+
+  if (!isLoggedIn) {
+    return (
+      <div className="footprint_container">
+        <Sidebar />
+        <div className="main-content">
+          <div
+            style={{
+              backgroundColor: '#fffbe6',
+              padding: '1rem',
+              border: '1px solid #ffd700',
+              borderRadius: '8px',
+              color: '#333',
+              textAlign: 'center',
+              marginTop: '2rem',
+            }}
+          >
+            <p style={{ margin: 0, fontSize: '1.1rem' }}>
+              <strong>로그인이 필요합니다.</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container">
@@ -92,7 +122,6 @@ const MyPage = () => {
             ))}
           </div>
 
-          {/* 30개 채웠을 때만 보상 메시지 */}
           {totalStampCount > 0 && totalStampCount % 30 === 0 && (
             <div className="reward-message">
               <p style={{ color: 'green' }}>

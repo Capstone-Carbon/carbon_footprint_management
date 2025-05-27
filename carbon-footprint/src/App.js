@@ -76,16 +76,30 @@ const Sidebar = () => {
 };
 
 function App() {
+  const [userId, setUserId] = useState(null);
   const [graphData, setGraphData] = useState([]);
+  const [trendResult, setTrendResult] = useState(null);
+  const [stampCount, setStampCount] = useState(3); // 스탬프 개수 관리
 
-  const fetchGraphData = async () => {
-    const userId = localStorage.getItem('userId');
-    if (!userId) return;
+  // ✅ userId를 로컬 스토리지에서 먼저 읽어오기
+  useEffect(() => {
+    const storedId = localStorage.getItem('userId');
+    if (storedId) {
+      setUserId(storedId);
+    }
+  }, []);
 
+  // ✅ userId가 있을 때만 fetch 시작
+  useEffect(() => {
+    if (userId) {
+      fetchGraphData(userId);
+      fetchTrendPrediction(userId);
+    }
+  }, [userId]);
+
+  const fetchGraphData = async (uid) => {
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/transport_history/${userId}`
-      );
+      const response = await fetch(`http://127.0.0.1:8000/transport_history/${uid}`);
       if (!response.ok) throw new Error('그래프 데이터 로드 실패');
 
       const data = await response.json();
@@ -95,16 +109,9 @@ function App() {
     }
   };
 
-  const [trendResult, setTrendResult] = useState(null);
-
-  const fetchTrendPrediction = async () => {
-    const userId = localStorage.getItem('userId');
-    if (!userId) return;
-
+  const fetchTrendPrediction = async (uid) => {
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/predict_trend/${userId}`
-      );
+      const response = await fetch(`http://127.0.0.1:8000/predict_trend/${uid}`);
       if (!response.ok) throw new Error('예측 요청 실패');
 
       const data = await response.json();
@@ -113,14 +120,7 @@ function App() {
       console.error('❌ 예측 실패:', error);
     }
   };
-
-  useEffect(() => {
-    fetchTrendPrediction();
-    fetchGraphData();
-  }, []);
-
-  const [stampCount, setStampCount] = useState(3); // 스탬프 개수 관리
-
+  
   return (
     <UserProvider>
       <Router>
@@ -188,6 +188,8 @@ function App() {
                       <div className="my-carbon">
                         <h2>나의 탄소 발자국</h2>
                         <div className="mainpage_chart">
+
+
                           {graphData.length > 0 ? (
                             graphData.map((entry, index) => {
                               const total =
